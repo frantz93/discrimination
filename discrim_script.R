@@ -7,7 +7,7 @@ library(descr)
 library(gplots)
 
 # Lecture et visualisation de la base de donnees
-load("base.RData")
+load("discrimination/base.RData")
 str(base)
 head(base)
 
@@ -79,7 +79,6 @@ plot(res.mca, choix = "quanti.sup")
 plot(res.mca, choix = "var", xlim = c(0, 0.5), ylim = c(0, 0.6))
 
 summary(res.mca)
-dimdesc(res.mca)
 
 cor(baseQC$SAL, baseQC$YRS.TENURE, use = "complete.obs")
 cor.test(baseQC$SAL, baseQC$YRS.TENURE, use = "complete.obs")
