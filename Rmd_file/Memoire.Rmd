@@ -1,0 +1,205 @@
+---
+title: 'Discrimination dans l’accès à l’emploi et la rémunération : le cas des immigrants
+  au Québec'
+author: "Frantz Roby POINT DU JOUR"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: TRUE
+    number_sections: TRUE
+  pdf_document: 
+    toc: TRUE
+    number_sections: TRUE
+bibliography: references.bib
+link-citations: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo=FALSE, message=FALSE, warning=FALSE)
+options(digits = 4/2, scipen = 00)
+library(tidyverse)
+library(knitr)
+library(flextable)
+library(kableExtra)
+```
+
+# RESUMÉ {.unnumbered}
+
+Cette étude fait une comparaison entre les immigrants et les natifs dans la province du Québec au Canada, en ce qui a trait à l'accès à l'emploi et à la rémunération salariale. L'accès à l'emploi est mesuré en termes de probabilité de chômage longue durée (soit un minimum de 12 mois) et la rémunération en termes de salaire horaire perçu par l'individu. Nous utilisons pour cela des méthodes de régression linéaire et logistique ainsi que des méthodes de décomposition des inégalités observées entre les groupes (méthode Oaxaca-Blinder et méthode Fairlie). Les [**résultats**]{style="color:blue"} \textcolor{blue}{\bf{résultats}} de notre recherche prouvent l'existence d'une discrimination à l'encontre des immigrants tant au niveau de l'accès à l'emploi que de la rémunération. Au niveau de l'accès à l'emploi, un immigrant chômeur a 2,4 fois plus de chance d'expérimenter un chômage longue durée (au moins 12 mois) par rapport à un natif. Il y a un surplus de probabilité de chômage long de 8,2% chez les immigrants chômeurs qui ne s'explique par une discrimination purement négative contre ces derniers. Au niveau de la rémunération, l'immigrant moyen gagne un salaire horaire environ 10% inférieur à celui d'un natif, toutes choses égales par ailleurs. Il y a un écart inexpliqué de 3,4\$ entre le salaire horaire moyen que les immigrants auraient dû recevoir et ce qu'ils reçoivent dans la réalité. Ces résultats appellent à un renforcement des politiques d'insertion professionnelle et de lutte contre les discriminations à l'endroit des immigrants au Québec.
+
+# INTRODUCTION
+
+La discrimination envers des groupes d'individus sur le marché du travail reste un sujet d'actualité. Alors que tous les gouvernements poursuivent des objectifs de création d'emplois et de croissance économique, il en résulte évidemment un enjeu d'inégalité et de justice sociale. Il arrive en effet que des employeurs accordent des traitements inéquitables aux individus non pas sur la base des critères de productivité (ex. niveau d'éducation, profession, etc.) mais en raison d'autres caractéristiques non productives telles que le sexe, l'origine ou l'apparence physique [@carcillo2018]. Cette situation reconnue comme de la discrimination s'avère être un frein important au développement des pays. Car au-delà de la croissance, il importe de considérer l'aspect qualitatif de l'évolution économique.
+
+Avec les progrès technologiques et la mondialisation des économies, la migration des populations entre les régions et les pays est de plus en plus répandue. Ainsi plusieurs pays dont le Canada mettent en place des politiques migratoires d'envergure. Ces mesures visent à soutenir le taux de croissance de la population tout en favorisant la croissance et le développement économique. Parmi toutes les provinces canadiennes, le Québec est celle qui accorde une importance toute particulière à ses politiques migratoires car elle poursuit l'objectif supplémentaire de la protection de la langue française. La province jouit par conséquent d'une exemption singulière en ayant la possibilité de choisir une grande majorité de ces immigrants suivant les besoins précises de son économie. Les immigrants québécois sont alors finement sélectionnés à partir d'un éventail de programmes minutieusement conçus par le ministère de l'immigration du Québec. Cependant, si les efforts de planification de l'immigration québécoise ont aidé à améliorer la situation des immigrants en termes de taux d'emploi et de chômage par exemple, de nombreuse interrogations se posent encore quant à l'intégration des immigrants sur le marché du travail [@aziaba2020; @guay2021] [^1].
+
+[^1]: L'individu au chômage est celui dont la durée du chômage est supérieure au égale 12 mois.
+
+Dans ce contexte, nous nous posons la question suivante : quel est le niveau d'intégration des immigrants au Québec en termes d'accès à l'emploi et de rémunération salariale ? Notre objectif est de déterminer s'il existe une discrimination entre les immigrants et les personnes nées au Canada au niveau de la facilité d'accès à l'emploi et du montant de salaire perçu. Plus spécifiquement, nous cherchons à :
+
+1.  Déterminer si une personne immigrante au Québec est rémunérée au même niveau qu'une personne née au Canada.
+2.  Vérifier si les immigrants restent plus longtemps au chômage que les non-immigrants.
+
+Le présent travail est structuré comme suit. Dans un premier temps, nous discutons de la littérature au sujet des facteurs déterminants dans l'accès à l'emploi et la rémunération. Nous nous basons sur ces éléments de discussion pour sélectionner des variables à intégrer dans la construction de nos modèles économétriques. Ces derniers sont présentés dans la deuxième section portant sur la méthodologie de l'étude. Nous y exposons également des méthodes de décomposition utilisées pour expliquer les inégalités mesurées entre les immigrants et les non-immigrants. La troisième section expose les résultats de notre recherche et leur analyse. Elle est suivie d'une conclusion sur les principales retombées de l'étude ainsi que ses limites.\
+
+# REVUE DE LITTÉRATURE
+
+## Discrimination sur le marché du travail
+
+Dans cette section, nous faisons une brève discussion de la littérature concernant la discrimination sur le marché du travail notamment envers les immigrants.
+
+### Les théories à la base de la discrimination
+
+La littérature portant sur les explications théoriques de la discrimination est assez abondante. La discrimination est définie de multiple manière. Nous nous focalisons ici la discrimination économique. En général, on admet deux principaux types de discrimination :
+
+-   Il y a la discrimination dite intentionnelle ou pure qui est dûment identifiée comme une décision de traiter inéquitablement un groupe d'individus par rapport à un autre. Comme le souligne @bon-maury2016, il s'agit ici d'une situation où une personne est traitée de manière moins favorable par rapport à une autre à cause de son appartenance ou de sa non-appartenance, vraie ou supposée, à un groupe comme une ethnie ou une race, un sexe, une religion, ou encore une origine. Cette vision est confortées par les travaux de @becker1971 pour qui la discrimination résulte d'un acte intentionnel de la part de l'employeur. Ce choix de l'employeur peut être dû à sa volonté de garder ses distances avec un groupe d'individus présentant des caractéristiques données, ou encore à ses préférences pour groupes d'individus particulier. Cette volonté de discrimination observée chez l'employeur peut dépendre entièrement de lui-même, du goût partagé par ces employés, ou encore de la pression exercée par les consommateurs.
+-   Par ailleurs, la discrimination peut être l'effet d'un acte non intentionnel. En effet, certaines dispositions ou pratiques apparemment neutre peuvent toujours entraîner un désavantage particulier pour des personnes par rapport à d'autres [@bon-maury2016]. On retrouve ici les idées de @phelps1972 pour lequel les employeurs averses au risque sont conduits à faire des choix qui, en situation d'asymétrie d'information, sont forcément guidés par des croyances et génèrent donc une attitude discriminante.
+
+Finalement, il faut reconnaitre que nous traitons ici d'un phénomène assez complexe à analyser. Car comme l'affirme @gazier2010, la discrimination est un phénomène multi-dimensionne qui met en jeu des interactions entre de nombreux acteurs dans de nombreux domaines et selon de multiples modalités. Dans la littérature, trois approches sont généralement utilisées pour mesurer ce phénomène [@bon-maury2016] : les enquêtes de victimation où l'on mesure de la perception des victimes déclarées; la méthode *testing* qui met en évidence un traitement inégal dans une situation donnée; et la méthode statistique d'étude des écarts entre la situation d'un groupe discriminé et celle d'un groupe de référence. Cette dernière méthode concerne la méthodologie adoptée dans le cadre de cette étude et que nous exposeront à la prochaine section.
+
+### Discrimination envers les immigrants
+
+Plusieurs études soulèvent des cas de discrimination envers les immigrants sur des marché du travail dans certains pays. @aeberhardt2013 montrent par exemple que le marché du travail français est impacté par ce phénomène. Leur étude souligne l'existence d'écart de salaire et de taux d'emploi entre les individus de descendance française et ceux dont les parents sont originaires du Maghreb, d'Afrique sub-saharienne et du Proche-Orient, voire des pays d'Europe du Sud. Aux Etats-Unis, @hersch2008 montre que même au sein du groupe des immigrants, il y a de la discrimination salariale sur la base de la couleur de leur peau, les noirs étant rémunérés à un niveau inférieur par rapport à leurs homologues immigrants blancs.
+
+Le marché du travail au Québec ne semble pas être épargné par les phénomène discriminatoire contre les immigrants, bien que la discrimination soit interdite légalement et condamnée dans cette province du Canada. Dans son étude mobilisant la méthode testing, @eid2012 étudie le comportement des recruteurs à l'égard des candidats à l'emploi à Montréal (Québec). Les résultats révèlent qu'à profil égal, un candidat majoritaire ayant un nom franco-québécois a au moins 60 % plus de chances d'être invité à un entretien qu'un candidat avec un nom arabe, latino-américain ou africain. Par ailleurs, ces derniers courent un plus grand risque d'être ignorés par l'employeur après leur entrevue, et cela sur une base discriminatoire. Dans une autre étude, @chicha2012 souligne qu'une proportion de plus en plus grande d'immigrantes au Québec occupent des emplois peu qualifiés et cela de façon durable. L'auteure mobilise une approche qualitative pour expliquer comment des immigrantes détenant un diplôme universitaire dans leur pays d'origine subissent une déqualification lorsqu'elles s'établissent au Québec.
+
+Les constats précédents justifient la nécessité de réaliser d'autres études en mobilisant d'autres méthodes possibles pour analyser le problème de la discrimination sur le marché québécois. Dans le cadre de notre étude, nous mobilisons la méthode statistique d'étude des écarts pour mesurer la discrimination entre les personnes nées au Québec ou au Canada et les immigrants internationaux d'une manière général.
+
+# MÉTHODOLOGIE
+
+Afin de réaliser ce travail, une méthodologie en trois phases a été appliquée : collecte de données, analyse exploratoire, analyse économétrique. Nous présentons ci-dessous de manière détaillée chacune de ces étapes.
+
+## Collecte des données
+
+Les données ont été collectées sur le site de Statistique Canada, l'institution gouvernementale de référence en matière de production de données statistiques. Statistique Canada réalise mensuellement une Enquête sur la population active (EPA) et publie les données brutes collectées à chaque fin du mois. Cette enquête vise à informer sur la situation du marché de l'emploi à travers tous le Canada. A cet effet, les données publiées concernent toutes les provinces canadiennes. Nous nous intéressons toutefois aux données qui concernent le Québec. Dans le cadre de cette étude, nous avons utilisé les données publiées au mois d'avril 2022. Des informations supplémentaires concernant l'EPA ainsi que les données publiées sont accessibles en ligne[^2]. La base de données utilisée `base.RData` accompagnée du fichier script R `discrim_script.R` sont fournie en annexe afin de favoriser la reproductibilité du travail. Le dictionnaire détaillé des principales variables présentes dans la base se trouve dans le fichier `dico.csv`. Ci-dessous, nous présentons les variables constituées après la phase de traitement des données sur R.
+
+[^2]: L'individu au chômage est celui dont la durée du chômage est supérieure au égale 12 mois.
+
+```{r descripbase}
+
+# Lecture et visualisation de la base de donnees
+load("../base.RData")
+
+# Creation et formattage des variables
+attach(base)
+
+base$YOUNG <- factor(if_else(AGE < 3, 1, 0))
+base$WOMAN <- factor(if_else(SEX == 1, 0, 1))
+base$MARRIED <- factor(if_else(MARSTAT == 1, 1, 0))
+base$EDUC.LEVEL <- factor(if_else(EDUC < 3, 0, if_else(EDUC < 5, 1, 2)))
+base$IMMIGRANT <- factor(if_else(IMMIG != 3, 1, 0))
+base$ISPAID <- factor(PAID)
+base$SELF.EMP <- factor(if_else(CATWORK == 1, 0, 1))
+base$PART.TIME <- factor(if_else(WTIME == 2, 1, 0))
+base$SYNDIC <- factor(if_else(UNION != 3, 1, 0))
+base$LARGFIRM <- factor(if_else(FIRMSIZE == 4, 1, 0))
+base$ISUNEMP <- factor(UNEMP)
+base$LONG.UNEMP <- factor(if_else(DURUNEMP >= 52, 1, 0))
+base$OCCUP.SEC <- factor(OCCUP)
+base$OCCUP.SEC <- factor(OCCUP, levels = c(7, 1, 2, 3, 4, 5, 6, 8, 9, 10))
+base$SAL <- HRLYEARN/100
+base$YRS.TENURE <- base$TENURE/12
+
+base$PROVINCE <- factor(PROV, labels = c("Terre-Neuve-et-Labrador", "Île-du-Prince-Édouard", "Nouvelle-Écosse", "Nouveau-Brunswick", 
+                                         "Québec", "Ontario", "Manitoba", "Saskatchewan", "Alberta", "Colombie-Britannique"))
+base$LN.SAL <- log(base$SAL)
+
+descrip <- data.frame(Variable=names(select(base,c(18:32))), 
+                      Description=c("Catégorie d’âge de l’individu : (1) si âgé de moins de 30 ans ; (0) sinon.",
+                                    "Genre femme : (1) s’il s’agit d’une femme ; (0) pour les hommes.",
+                                    "Statut matrimonial : (1) si marié ; (0) sinon.",
+                                    paste0("Niveau d’éducation : (0) faible [études secondaires ou moins] ; (1) moyen [études ",
+                                           "post-secondaires inférieures au baccalauréat] ; (2) élevé [diplôme de baccalauréat ",
+                                           "ou plus]"),
+                                    "Statut d’immigrant : (1) si la personne est immigrante ; (0) si la personne est née au Canada.",
+                                    "Statut de salarié : (1) si la personne perçoit un salaire ; (0) sinon.",
+                                    paste0("Statut de travailleur autonome : (1) si le répondant est travailleur autonome ; ",
+                                           "(0) s’il s’agit d’un employé."),
+                                    "Temps de travail : (1) temps partiel ; (0) temps plein.",
+                                    paste0("(1) Si la personne est membre d’un syndicat ou couverte par une convention collective ",
+                                           "négociée par un syndicat ; (0) sinon."),
+                                    paste0("Taille de l’entreprise employeuse : (1) pour les grandes firmes de plus de 500 employés",
+                                           "; (0) pour les plus petites entreprises."),
+                                    "(1) Si la personne est au chômage ; (0) sinon.",
+                                    "(1) Pour les personnes en recherche d’emploi depuis au moins 12 mois chômage long ; (0) sinon.",
+                                    paste0("Catégories professionnelles selon le système de classification nationale : (1) Gestion ",
+                                           "(2) Affaires, finance et administration (3) Sciences naturelles et appliquées et ",
+                                           "domaines apparentés (4) Secteur de la santé (5) Enseignement, droit et services ",
+                                           "sociaux, communautaires et gouvernementaux (6) Arts, culture, sports et loisirs ",
+                                           "(7) Vente et services (8) Métiers, transport, machinerie et domaines apparentés ",
+                                           "(9) Ressources naturelles, agriculture et production connexe ",
+                                           "(10) Fabrication et services d'utilité publique"),
+                                    "Salaire horaire habituel (en dollar canadien)",
+                                    "Durée de l'emploi avec l'employeur actuel (en années)"))
+
+kable(descrip, caption = "Description des variables", "simple")
+#descrip %>% regulartable() %>% autofit() %>% width(j=~Variable, width = 1) %>% width(j=~Description, width = 5.4) %>% set_caption("Description des variables") #for fitting PDF doc
+```
+
+## Analyse exploratoire
+
+Afin de mieux visualiser les variables dans la base de données nous faisons une analyse exploratoire. Cette analyse est réalisée sur R. Nous vérifions les statistiques descriptives des variables, et aussi les répartitions des proportion d'immigrants et de natifs dans les différentes catégories des variables. Nous réalisons également une Analyse en composantes multiples (ACM) afin de détecter des liens potentiels entre les variables. Sur R, le modèle ACM est obtenu à partir de la commande : `MCA(dataframe, quali.sup, quanti.sup)` de la librairie `FactoMineR`.
+
+## Analyse économétrique
+
+Ce travail est articulé autour de deux principaux modèles économétriques. Un premier modèle de régression linéaire multiple (OLS) sert à vérifier l'existence d'une discrimination dans la rémunération salariale entre les immigrants et les natifs. L'analyse est approfondie par la méthode de décomposition d'Oaxaca-Blinder des inégalités salariaux observés entre les deux groupes. Le deuxième modèle estime la probabilité qu'un individu chômeur tombe en situation de chômage longue durée[^3]. Nous utilisons la méthode de régression logistique pour estimer les probabilités par Maximum de Vraissemblance. Les écarts de probabilités obtenues sont ensuite décomposés par la méthode Fairlie. Touts les calculs économétriques ont été réalisés sur R. Nous décrivons succintement les modèles de régression et les méthodes de décompositions à travers les lignes qui vont suivre.
+
+[^3]: L'individu au chômage est celui dont la durée du chômage est supérieure au égale 12 mois.
+
+### Modélisation de la rémunération salariale
+
+Le modèle de régression du salaire horaire est le suivant :
+
+$Ln(SAL) = \hat{b}_{0} + \hat{b}_{1}YOUNG + \hat{b}_{2}WOMAN + \hat{b}_{3}MARRIED + \hat{b}_{4}EDUC. LEVEL + \hat{b}_{5}IMMIGRANT + \hat{b}_{6}SELF.EMP$ $+ \hat{b}_{7}PART. TIME + \hat {b}_{8}SYNDIC + \hat {b}_{9}LARGFIRM + \hat {b}_{10}OCCUP. SEC + \hat {b}_{11}YRS. TENURE + \epsilon$
+
+La régression par la méthode OLS permet d'estimer les variations en pourcentage dans le salaire horaire suite à une modification dans les variables indépendantes. Sur R, la régression multilinéaire est obtenue à partir de la commande : `lm(formula, data)`.
+
+### Décomposition des inégalités salariaux : méthode Oaxaca
+
+La méthode Oaxaca-Blinder est la méthode la plus classique utilisée en économétrie pour décomposer les inégalités mesurées entre deux groupes pour une variable donnée [@insee2019]. Elle est facilement applicable lorsque la variable d'intérêt est continue comme dans le cas du salaire. Cette méthode décompose l'écart observé entre les moyennes mesurées dans chaque groupe en deux parties : une partie expliquée par les différences de caractéristiques entre les groupes et une partie inexpliquée. Dans notre cas actuel où la mesure porte sur l'écart de salaire entre les immigrants et les natifs, la partie inexpliquée de l'écart observé correspondra à une discrimination salariale pure en faveur d'un groupe et en défaveur d'un autre groupe. L'équation de la décomposition par la méthode Oaxaca est la suivante :
+
+$\bar{Y}_{B}-\bar{Y}_{A} = \underbrace {\left [ \sum_{k=1}^{K} \left( \bar{X}_{Bk}-\bar{X}_{Ak} \right) \hat{\beta}_{Bk} \right ]}_{\Delta_{x}:\mbox{ explained}} + \underbrace {\left [ \left( \hat{\beta}_{B0} - \hat{\beta}_{A0} \right) + \sum_{k=1}^{K} \hat{X}_{Ak} \left( \hat{\beta}_{Bk} - \hat{\beta}_{Ak} \right) \right ]}_{\Delta_{x}:\mbox{ unexplained}}$
+
+Où $\bar{Y}_{B}-\bar{Y}_{A}$ est la valeur de l'écart observé entre les moyennes des groupes B et A; les $\left ( \hat{\beta}_{g,k} \right )_{k=1\cdots K, g=A,B}$ sont les coefficients de valorisation des caractéristiques *k* dans chaque groupe *g*; $\left ( \bar{X}_{g,k} \right )_{k=1\cdots K, g=A,B}$ sont les moyennes mesurées des caractéristiques *k* dans chaque groupe *g*.
+
+### Modélisation de la facilité d'accès à l'emploi
+
+Le modèle de régression de la probabilité de chômage long est le suivant :
+
+$Ln\left( \frac{p \left( 1 \mid X \right)}{1 - p \left( 1 \mid X \right)} \right) = \hat{b}_{0} + \hat{b}_{1}YOUNG + \hat{b}_{2}WOMAN + \hat{b}_{3}MARRIED + \hat{b}_{4}EDUC. LEVEL + \hat{b}_{5}IMMIGRANT$
+
+Où $p \left( 1 \mid X \right)$ désigne la probabilité d'être en chômage longue durée.
+
+Cette régression mobilise une loi logistique pour estimer les variations dans la probabilité de tomber en situation de chômage long. Sur R, la régression logistique est réalisée à l'aide de la commande : `glm (formula, data, family = binomial(link="logit"))`\`.
+
+### Décomposition des probabilités de chômage long : méthode Fairlie
+
+La méthode Fairlie est une alternative à la méthode Oaxaca-Blinder pour décomposer un écart à la moyenne entre deux groupe, lorsque l'approximation linéaire pose problème ou lorsque les différences de caractéristiques observables sont très marquées entre les deux groupes (INSEE, 2019). Elle est adaptée pour la modélisation non linéaire de type probit ou logit. L'équation de la décomposition est la suivante :
+
+$\bar{Y}_{B} - \bar{Y}_{A} = \underbrace {\frac{1}{N_{B}} \sum_{i \in B} Y_{i} - \frac{1}{N_{A}} \sum_{i \in A} \hat{P}_{B}(Y_{i} = 1 \mid X_{i})}_{\mbox{explained}} + \underbrace {\frac{1}{N_{A}} \sum_{i \in A} \hat{P}_{B}(Y_{i} = 1 \mid X_{i}) - \frac{1}{N_{A}} \sum_{i \in A} Y_{i}}_{\mbox{unexplained}}$
+
+Avec $\bar{Y}_{B} - \bar{Y}_{A}$, l'écart observé entre les moyennes des groupes *B* et *A*; $N_{A}$ et $N_{B}$, les effectifs dans les deux groupes; $\hat{P}_{B}(Y_{i} = 1 \mid X_{i})$, les estimations de probabilités contrefactuelles pour chaque individu du groupe *A* (i-e, la probabilité que l'individu du groupe A soit en chômage long si ses caractéristiques sont valorisées comme celles du groupe *B*). Le contrefactuel est fondé sur l'estimation du modèle probit ou logit.
+
+# RÉSULTATS
+
+`r baseQC <- base %>% filter(PROVINCE == "Québec") %>% select(c(18:32,34))`
+
+Le Tableau ci-dessous présente la répartition de notre échantillon suivant les différentes variables de la base de données. Notre échantillon comprend `r nrow(baseQC)` individus dont 13% d'immigrants. Ce pourcentage est similaire à celui observé dans la population québécoise, soit 13.7% d'immigrants selon le dernier recensement de 2016 [@mifi2021]. Par ailleurs, il y a une majorité de répondants salariés ou travailleurs autonomes. La majorité des travailleurs sont à temps plein et ne sont pas protégés par un syndicat. Les jeunes (-30ans) et les mariés sont minoritaires, alors que les répondants sont équitablement répartis entre les femmes et les hommes. Plus de 60% des répondants ont un niveau d'éducation moyen ou élevé contre 33% de personnes à faible niveau d'éducation. La plupart des travailleurs sont répartis dans les ventes et services comparativement aux autres catégories professionnelles. En moyenne, les salariés gagnaient `r mean(baseQC$SAL, na.rm=TRUE)` \$5/h et occupaient leur emploi actuel depuis 7.85 années. Toutefois, ces valeurs moyennes ne représentent pas bien leur distribution qui sont très dispersées.
+
+```{r statdesc}
+baseQC <- base %>% filter(PROVINCE == "Québec") %>% select(c(18:32,34))
+attach(baseQC)
+
+stat1 <- data.frame(variable = c("YOUNG","WOMAN","MARRIED","EDUC.LEVEL_0","EDUC.LEVEL_1","EDUC.LEVEL_2","IMMIGRANT","ISPAID","SELF.EMP","PART.TIME","SYNDIC","LARGFIRM","ISUNEMP","LONG.UNEMP"), n = c(sum(YOUNG=='1', na.rm=TRUE),sum(WOMAN=='1', na.rm=TRUE),sum(MARRIED=='1', na.rm=TRUE),sum(EDUC.LEVEL=='0', na.rm=TRUE),sum(EDUC.LEVEL=='1', na.rm=TRUE),sum(EDUC.LEVEL=='2', na.rm=TRUE),sum(IMMIGRANT=='1', na.rm=TRUE),sum(ISPAID=='1', na.rm=TRUE),sum(SELF.EMP=='1', na.rm=TRUE),sum(PART.TIME=='1', na.rm=TRUE),sum(SYNDIC=='1', na.rm=TRUE),sum(LARGFIRM=='1', na.rm=TRUE),sum(ISUNEMP=='1', na.rm=TRUE),sum(LONG.UNEMP=='1', na.rm=TRUE)), prop_n = c(mean(YOUNG=='1', na.rm=TRUE),mean(WOMAN=='1', na.rm=TRUE),mean(MARRIED=='1', na.rm=TRUE),mean(EDUC.LEVEL=='0', na.rm=TRUE),mean(EDUC.LEVEL=='1', na.rm=TRUE),mean(EDUC.LEVEL=='2', na.rm=TRUE),mean(IMMIGRANT=='1', na.rm=TRUE),mean(ISPAID=='1', na.rm=TRUE),mean(SELF.EMP=='1', na.rm=TRUE),mean(PART.TIME=='1', na.rm=TRUE),mean(SYNDIC=='1', na.rm=TRUE),mean(LARGFIRM=='1', na.rm=TRUE),mean(ISUNEMP=='1', na.rm=TRUE),mean(LONG.UNEMP=='1', na.rm=TRUE)))
+
+stat2 <- data.frame(variable = c("OCCUP.SEC1","OCCUP.SEC2","OCCUP.SEC3","OCCUP.SEC4","OCCUP.SEC5","OCCUP.SEC6","OCCUP.SEC7","OCCUP.SEC8","OCCUP.SEC9","OCCUP.SEC10"),
+                    n = c(sum(OCCUP.SEC=='1', na.rm=TRUE),sum(OCCUP.SEC=='2', na.rm=TRUE),sum(OCCUP.SEC=='3', na.rm=TRUE),sum(OCCUP.SEC=='4', na.rm=TRUE),sum(OCCUP.SEC=='5', na.rm=TRUE),sum(OCCUP.SEC=='6', na.rm=TRUE),sum(OCCUP.SEC=='7', na.rm=TRUE),sum(OCCUP.SEC=='8', na.rm=TRUE),sum(OCCUP.SEC=='9', na.rm=TRUE),sum(OCCUP.SEC=='10', na.rm=TRUE)),
+                    prop_n = c(mean(OCCUP.SEC=='1', na.rm=TRUE),mean(OCCUP.SEC=='2', na.rm=TRUE),mean(OCCUP.SEC=='3', na.rm=TRUE),mean(OCCUP.SEC=='4', na.rm=TRUE),mean(OCCUP.SEC=='5', na.rm=TRUE),mean(OCCUP.SEC=='6', na.rm=TRUE),mean(OCCUP.SEC=='7', na.rm=TRUE),mean(OCCUP.SEC=='8', na.rm=TRUE),mean(OCCUP.SEC=='9', na.rm=TRUE),mean(OCCUP.SEC=='10', na.rm=TRUE)))
+
+stat3 <- data.frame(variable = c("SAL","YRS.TENURE"), moy = c(mean(SAL, na.rm=TRUE), mean(YRS.TENURE, na.rm=TRUE)), ecart_type = c(sd(SAL, na.rm=TRUE), sd(YRS.TENURE, na.rm=TRUE)))
+
+kables(list(kable(stat1) %>% kable_styling(), list(kable(stat2) %>% kable_styling(), kable(stat3) %>% kable_styling())), caption = "Statistique descriptive") %>% kable_styling()
+
+```
+
+# BIBLIOGRAPHIE
