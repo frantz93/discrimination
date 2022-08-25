@@ -33,7 +33,7 @@ La discrimination envers des groupes d'individus sur le marché du travail reste
 
 Avec les progrès technologiques et la mondialisation des économies, la migration des populations entre les régions et les pays est de plus en plus répandue. Ainsi plusieurs pays dont le Canada mettent en place des politiques migratoires d'envergure. Ces mesures visent à soutenir le taux de croissance de la population tout en favorisant la croissance et le développement économique. Parmi toutes les provinces canadiennes, le Québec est celle qui accorde une importance toute particulière à ses politiques migratoires car elle poursuit l'objectif supplémentaire de la protection de la langue française. La province jouit par conséquent d'une exemption singulière en ayant la possibilité de choisir une grande majorité de ces immigrants suivant les besoins précises de son économie. Les immigrants québécois sont alors finement sélectionnés à partir d'un éventail de programmes minutieusement conçus par le ministère de l'immigration du Québec. Cependant, si les efforts de planification de l'immigration québécoise ont aidé à améliorer la situation des immigrants en termes de taux d'emploi et de chômage par exemple, de nombreuse interrogations se posent encore quant à l'intégration des immigrants sur le marché du travail [@aziaba2020; @guay2021] [^1].
 
-[^1]: L'individu au chômage est celui dont la durée du chômage est supérieure au égale 12 mois.
+[^1]: Aziaba (2020) rapporte une hausse de 6% du taux d’emploi et une baisse de 10% du taux de chômage chez les immigrants du principal groupe d’âge actif du Québec, entre 2006 et 2017.
 
 Dans ce contexte, nous nous posons la question suivante : quel est le niveau d'intégration des immigrants au Québec en termes d'accès à l'emploi et de rémunération salariale ? Notre objectif est de déterminer s'il existe une discrimination entre les immigrants et les personnes nées au Canada au niveau de la facilité d'accès à l'emploi et du montant de salaire perçu. Plus spécifiquement, nous cherchons à :
 
@@ -73,7 +73,7 @@ Afin de réaliser ce travail, une méthodologie en trois phases a été appliqu�
 
 Les données ont été collectées sur le site de Statistique Canada, l'institution gouvernementale de référence en matière de production de données statistiques. Statistique Canada réalise mensuellement une Enquête sur la population active (EPA) et publie les données brutes collectées à chaque fin du mois. Cette enquête vise à informer sur la situation du marché de l'emploi à travers tous le Canada. A cet effet, les données publiées concernent toutes les provinces canadiennes. Nous nous intéressons toutefois aux données qui concernent le Québec. Dans le cadre de cette étude, nous avons utilisé les données publiées au mois d'avril 2022. Des informations supplémentaires concernant l'EPA ainsi que les données publiées sont accessibles en ligne[^2]. La base de données utilisée `base.RData` accompagnée du fichier script R `discrim_script.R` sont fournie en annexe afin de favoriser la reproductibilité du travail. Le dictionnaire détaillé des principales variables présentes dans la base se trouve dans le fichier `dico.csv`. Ci-dessous, nous présentons les variables constituées après la phase de traitement des données sur R.
 
-[^2]: L'individu au chômage est celui dont la durée du chômage est supérieure au égale 12 mois.
+[^2]: Enquêtes et programmes statistiques - Enquête sur la population active (EPA). [Consulter en ligne](https://www23.statcan.gc.ca/imdb/p2SV_f.pl?Function=getSurvey&Id=1389764)
 
 ```{r descripbase}
 
@@ -184,6 +184,10 @@ Avec $\bar{Y}_{B} - \bar{Y}_{A}$, l'écart observé entre les moyennes des group
 
 `r baseQC <- base %>% filter(PROVINCE == "Québec") %>% select(c(18:32,34))`
 
+## Analyse exploratoire
+
+### Description de l’échantillon
+
 Le Tableau ci-dessous présente la répartition de notre échantillon suivant les différentes variables de la base de données. Notre échantillon comprend `r nrow(baseQC)` individus dont 13% d'immigrants. Ce pourcentage est similaire à celui observé dans la population québécoise, soit 13.7% d'immigrants selon le dernier recensement de 2016 [@mifi2021]. Par ailleurs, il y a une majorité de répondants salariés ou travailleurs autonomes. La majorité des travailleurs sont à temps plein et ne sont pas protégés par un syndicat. Les jeunes (-30ans) et les mariés sont minoritaires, alors que les répondants sont équitablement répartis entre les femmes et les hommes. Plus de 60% des répondants ont un niveau d'éducation moyen ou élevé contre 33% de personnes à faible niveau d'éducation. La plupart des travailleurs sont répartis dans les ventes et services comparativement aux autres catégories professionnelles. En moyenne, les salariés gagnaient `r mean(baseQC$SAL, na.rm=TRUE)` \$5/h et occupaient leur emploi actuel depuis 7.85 années. Toutefois, ces valeurs moyennes ne représentent pas bien leur distribution qui sont très dispersées.
 
 ```{r statdesc}
@@ -201,5 +205,119 @@ stat3 <- data.frame(variable = c("SAL","YRS.TENURE"), moy = c(mean(SAL, na.rm=TR
 kables(list(kable(stat1) %>% kable_styling(), list(kable(stat2) %>% kable_styling(), kable(stat3) %>% kable_styling())), caption = "Statistique descriptive") %>% kable_styling()
 
 ```
+
+### Analyse en composantes multiples
+
+Nous testons l’existence d’interrelation entre les variables de notre base de données par une analyse factorielle en composante multiples (ACM). Nous utilisons pour cela la librairie FactoMineR sur R. Les variables d’identité individuelle (genre, âge, statut matrimonial, éducation et statut d’immigrant) sont retenues comme variables fondamentales constituant les dimensions du repère alors que les autres variables catégorielles sont identifiées comme variables qualitatives supplémentaires. Nous représentons aux Figure 2 et Figure 1 ci-dessous les coordonnées respectives des variables supplémentaires et des variables fondamentales les mieux projetées sur les deux premières dimensions du repère.
+
+````{r acm}
+
+````
+
+Nous pouvons établir l’existence d’une relation potentielle entre les variables qui se rapprochent dans une même partie du cadrant. Nous voyons ainsi à la Figure 2 que les travailleurs à temps partiels se retrouvent le plus souvent dans les professions des ventes et services, alors que ceux à temps plein sont souvent dans le secteur « Affaires, finance et administration » et sont couverts par un syndicat. Généralement, ces travailleurs à temps plein sont aussi des adultes âgés de 30 ans ou plus (voir la Figure 9 en annexe). Par ailleurs, les travailleurs dans le secteur de la santé ont le plus souvent le statut d’employé. La Figure 1 montre des relations moins fortes entre les variables fondamentales. Nous pouvons en déduire que les natifs sont le plus souvent des hommes avec un peu plus souvent un niveau d’éducation moyen, alors que les immigrants ont un peu plus souvent un niveau élevé d’éducation. La superposition des deux figures montre également que les natifs se retrouvent le souvent à travailler dans les professions des « Métiers, transport, machinerie et domaines apparentés » (voir la Figure 9 en annexe).
+
+
+Il est également possible de représenter les variables quantitatives dans le plan d’analyse en composante multiple. Les variables du salaire et de l’expérience au travail sont représentées à la Figure 8 en annexe. Ces variables se projettent dans un même sens et dans un même cadrant. Il y a donc une corrélation entre le nombre d’année d’expérience6 au travail et le salaire.
+
+### Analyse comparative : immigrants vs natifs
+
+L’analyse comparative entre immigrants et natifs québécois peut être initiée par une étude des statistiques descriptives des sous-échantillons dans chacune de ces catégories. Les données figurant au Tableau 9 en annexe montrent que par rapport aux natifs, il y a parmi les immigrants une plus grande proportion de mariés, de personnes ayant un niveau d’éducation élevée, et de travailleurs affiliés aux grandes entreprises. Les personnes au chômage et les chômeurs longue durée constituent également des proportions plus élevées dans la catégorie des immigrants. En ce qui concerne les catégories professionnelles, les immigrants sont plutôt mieux répartis dans les professions des secteurs : « Affaires, finance et administration », « Sciences naturelles et appliquées et domaines apparentés », « Santé », « Fabrication et services d'utilité publique ».
+
+Notre base de données comprend deux variables quantitatives : l’expérience au travail et le salaire. Nous comparons les distributions de ces variables dans les catégories des immigrants et des natifs. La Figure 3 montre que la distribution des salaires est beaucoup plus dispersée chez les immigrants comparativement aux natifs. Les inégalités salariales sont donc plus prononcées parmi les immigrants. En outre, nous observons que le salaire moyen est plus faible dans le groupe des immigrants (29,5$) comparativement aux natifs (30,3$). Dans la Figure 4, nous voyons que le nombre d’année d’expérience au travail est également plus faible dans le groupe des immigrants (6,4 vs 8,1 chez les natifs). Les détails sur les tests de moyenne sont donnés en annexe (Figure 7).
+
+````{r acomp1}
+
+````
+
+L’écart de salaire observé entre immigrants et natifs peut être dû à l’influence de facteurs autre que le statut d’immigrant. A ce stade, nous ne pouvons donc pas affirmer qu’un immigrant gagne moins qu’un natif. A la prochaine section, nous allons vérifier l’influence du statut d’immigrant sur le salaire en contrôlant l’effet d’autres variables dans un modèle économétrique.
+
+````{r acomp2}
+
+````
+
+## Mesure de la discrimination salariale
+
+Nous allons ici mesurer l’influence du statut d’immigrant sur la rémunération salariale des individus en tenant compte de l’effet possible d’autres facteurs. Dans un premier temps, nous estimons un modèle de régression multiple avec comme variable dépendante le logarithme des salaires. Nous appliquons ensuite la méthode Oaxaca pour décomposer les écarts de salaires mesurés entre les groupes des immigrants et des natifs.
+
+### Estimations par régression linéaire
+Le Tableau 3 présente les coefficients estimés de la régression. L’effet de chaque variable sur le salaire est calculé en pourcentage dans la colonne « Effects ». Avec un R2 ajusté de plus de 50%, le pouvoir explicatif de ce modèle est assez intéressant. Tous les coefficients des variables indépendantes sont significatifs au seuil α = 0,1. Les résultats des estimations montrent qu’un immigrant québécois gagne environ 10% de moins qu’un natif toute chose étant égale par ailleurs. Ce pourcentage équivaut à un écart d’environ 3,2 $ en faveur des natifs (voir le Tableau 10 en annexe). Il y a donc de la discrimination salariale en faveur des natifs. Le modèle indique par ailleurs que l’âge jeune (-30 ans), le genre (femme), le statut de travailleur autonome et le travail à temps partiel ont un effet négatif sur le niveau de salaire perçu par les individus, alors que toutes les autres variables ont une influence positive sur le salaire.
+
+Considérant l’influence des autres variables sur le salaire et tenant compte des inégalités de répartition des échantillons d’immigrants et de natifs dans chacune de ces variables, nous supposons que la discrimination salariale (immigrants vs natifs) est due en partie aux différences de caractéristiques entre les deux groupes. C’est cet aspect que nous allons approfondir à la section 3.1.2.
+
+````{r reg1}
+
+````
+
+### Décomposition de l’écart de salaire (immigrants vs non immigrants)
+Le Tableau 4 présente les résultats de la décomposition de l’écart salarial observé entre le groupe des non immigrants (A) et celui des immigrants (B). La première colonne donne la répartition des deux groupes dans l’échantillon alors que les moyennes de salaire associées à chaque groupe figurent dans la deuxième colonne. Nous observons une différence de salaire horaire de 0,83\$ en faveur des natifs (\$y.diff). Cet écart peut être décomposé suivant les données inscrites dans les deux dernières colonnes : -2,62\$ peuvent être expliqués par le modèle dont 63% (-1,63\$) sont dues à la stricte dotation en caractéristiques différentes entre les groupes et 37% (-0,99\$) aux interactions entre les caractéristiques et leur valorisation sur le marché; 3,44$ d’écart reste inexpliqué, ce qui peut être considéré comme une discrimination salariale pure.
+En prenant les natifs comme situation de référence, l’analyse des résultats de la décomposition indique que compte tenu des différences de caractéristiques (immigrants vs les natifs) et des interactions, on devrait en principe observer un salaire moyen de 32,9\$/h. Cela correspondrait à un écart salarial de 2,6\$ en faveur des immigrants. Or l’écart observé est plutôt de 0,8\$ en faveur des natifs. Cela explique la discrimination de 3,4$ en faveur des natifs.
+
+````{r ecart_decomp1}
+
+````
+
+Nous analysons de manière détaillée la formation de l’écart expliqué par les différences de caractéristiques (Figure 5). Les données chiffrées sont présentées en annexe au Tableau 12. Le niveau d’éducation élevé (EDUC.LEVEL2) et la présence au secteur des Sciences naturelles et appliquées (OCCUP.SEC3) sont les deux caractéristiques qui jouent le plus en faveur des immigrants et en défaveur des natifs. Ces caractéristiques représentent respectivement 88% et 54% de l’écart expliqué par les différences dans les dotations individuelles. Ces résultats concordent avec l’analyse descriptive de notre échantillon des salariés à l’Annexe A-2 (Tableau 11). On observe en effet que comparativement aux natifs, il y a une plus grande proportion d’immigrants ayant un niveau d’éducation élevé ou supérieur au baccalauréat7 (49,4% vs 24,6%) et concentrés dans les professions des Sciences naturelles et appliquées (14,7% vs 8,8%). Or ces critères sont valorisés positivement sur le marché du travail québécois (voir Tableau 3). Cela explique donc que le fait que les immigrants sont avantagés par ces caractéristiques.
+
+Par ailleurs, les immigrants sont favorisés par le fait d’être moins jeunes, de travailler davantage dans le secteur de la santé (OCCUP.SEC4), de travailler moins à temps partiel et plus dans les grandes entreprises. De leur côté, les non immigrants prennent de l’avantage à cause de leur meilleure répartition dans certaines catégories professionnelles (la gestion, les arts et les métiers du transport) ainsi que leur plus grande ancienneté dans l’emploi.
+
+Avec la prise en compte des interactions, les contributions des variables dans la formation du total des écarts expliqués par le modèle changent légèrement. Certaines variables comme le statut de marié jouent en faveur des immigrants alors que d’autres, comme le niveau d’éducation moyen, avantagent les natifs (voir Figure 10 à l’Annexe A-4).
+
+````{r endow}
+
+````
+
+La décomposition Oaxaca permet d’obtenir également un graphique sur la participation des variables à la formation des écarts inexpliqués (Figure 6). Nous voyons que les variables suivantes : statut de marié, niveau d’éducation moyen, niveau d’éducation élevé, métiers du transport (OCCUP.SEC8), protection par un syndicat, contribuent à augmenter l’écart inexpliqué entre les groupes. En revanche, la participation des natifs aux professions des Sciences naturelles et appliquées (OCCUP.SEC1) contribue à réduire cet écart.
+
+````{r coeff}
+
+````
+
+## Mesure de la discrimination dans l’accès à l’emploi
+
+Nous avons vu que les immigrants sont défavorisés sur le marché du travail québécois en ce qui a trait à la rémunération. Nous nous interrogeons à présent sur leur situation en termes d’accès à l’emploi. Est-ce que les immigrants arrivent à trouver un emploi aussi rapidement que les natifs ? Les résultats au tableau de contingence en annexe (Tableau 6) nous montraient que la proportion des chômeurs longue durée (t ≥ 12 mois) est significativement plus élevée parmi les immigrants que parmi les natifs. Nous devons néanmoins contrôler l’effet d’autres facteurs afin de pouvoir établir l’influence du statut d’immigrant sur la probabilité d’être en chômage long. Ci-dessous, nous présentons les résultats du modèle de régression de la probabilité de chômage. Nous utilisons ensuite la méthode de Fairlie afin de décomposer de l’écart observé entre les deux groupes.
+
+### Estimations par régression logistique
+
+Le Tableau 5 présente les résultats de la régression logistique de la probabilité qu’un individu en quête d’emploi sur le marché québécois se retrouve en situation de chômage long. Les variables âge, genre, statut matrimonial, éducation et statut d’immigrant ont été retenues pour la régression. Nous présentons les coefficients estimés ainsi que les Odds ratio pour chaque variable. Le statut de travailleur autonome et la catégorie professionnelle ont été exclues comme variable dans ce modèle par manque de données.
+
+Il ressort que le statut d’immigrant revêt une influence significativement positive sur la probabilité de chômage longue durée. L’Odds ratio calculé indique qu’un immigrant chômeur a 2,4 fois plus de chance de se retrouver en chômage long comparativement à un natif chômeur. L’analyse peut être complétée par une régression sur la probabilité d’être au chômage (voir Tableau 13 en annexe). Les immigrants ont également deux (2) fois plus de chance d’être au chômage. Par ailleurs, l’âge et le niveau d’éducation ont aussi un impact sur la durée du chômage.
+
+Les jeunes de moins de 30 ans ont 83% moins de chance d’être des chômeurs de longue durée. Cela peut être due au fait que les jeunes accèdent préférablement aux petits boulots non spécialisés qui sont moins bien rémunérés mais disponibles en plus grand nombre dans l’économie québécoise. Ou encore du fait que les jeunes se retirent du marché pour s’adonner aux études en cas d’une recherche d’emploi infructueuse. Cette dernière analyse nous parait plausible considérant que les jeunes se retrouve plus facilement au chômage (Annexe A-7, Tableau 13). En ce qui a trait au niveau d’éducation, plus il est élevé, moins le travailleur a la chance de se retrouver en chômage longue durée. Comparativement aux personnes à faible niveau d’éducation, la probabilité de chômage long est réduite de 65% pour les détenteurs d’un diplôme d’études post secondaire inférieures au baccalauréat et de 56% pour ceux ayant un baccalauréat ou plus. Ces résultats sont en accord avec la théorie du capital humain selon laquelle les individus constituent une ressource rare lorsqu’ils investissent dans leur formation (Vignolles, 2012). Ils peuvent par conséquent accéder plus facilement à l’emploi.
+
+````{r logit}
+
+````
+
+### Décomposition de l’écart de probabilité de chômage long
+
+Nous allons à présent décomposer l’écart de probabilité de chômage long observé entre les immigrants et les natifs. Tout d’abord nous vérifions l’écart entre les proportions d’individus chômeurs longue durée dans les deux groupes (Tableau 6). On remarque que 18,5% des chômeurs dans notre échantillon d’immigrants sont des chômeurs longs contre 9,2% chez les natifs. Cela donne un écart de 9,2% de probabilité de chômage long en faveur des natifs et en défaveur des immigrants. D’autres caractéristiques différencient les chômeurs parmi les immigrants et les natifs. Il y a une plus grande proportion de femmes, de mariés et de personne à éducation élevée parmi les immigrants chômeurs. Du côté des natifs, on observe une plus grande proportion de jeunes et de personnes à éducation moyenne comparativement aux immigrants.
+
+````{r diff_carac}
+
+````
+Dans le cas-ci où l'approximation linéaire s'avère problématique, la décomposition de l’écart entre deux groupes par la méthode d’Oaxaca-Blinder n’est pas appropriée. La méthode Fairlie adaptée la modélisation non linéaire de type probit ou logit permet de contourner ce problème (INSEE, 2019). Nous utilisons ainsi cette méthode pour décomposer l’écart observé dans la probabilité de chômage long. Le résultat de la décomposition est présenté au Tableau 7.
+
+Considérant les caractéristiques des immigrants présentés au tableau précédent, on devrait y observer une probabilité de chômage long de 10,3% soit 1,1% supérieur à celle des natifs, dans le cas où ces caractéristiques étaient valorisées comme celles des natifs. Or l’écart de probabilité réellement observé entre les groupes est de 9,2%. Il y a donc près de 8,2% d’écart qui demeure inexpliqué. Cela traduit une discrimination pure en faveur des natifs et en défaveurs des immigrants pour ce qui est de l’accès à l’emploi.
+
+````{r ecart_decomp2}
+
+````
+
+Contrairement à la méthode d’Oaxaca-Blinder, la méthode Fairlie ne nous permet pas de ventiler l’écart expliqué suivant la contribution des variables de caractéristiques. Nous pouvons néanmoins approfondir l’analyse sur la base des coefficients de valorisation des caractéristiques dans le groupe des natifs (Tableau 8). Nous voyons que les jeunes et les personnes de niveau d’éducation moyenne sont plus rarement en situation de chômage long chez les natifs. Or les immigrants sont moins bien répartis dans ces catégories (voir Tableau 6). Il s’en suit donc que ces variables jouent en défaveur des immigrants et en faveurs de natifs dans la formation de l’écart expliqué.
+
+````{r reg2}
+
+````
+
+# CONCLUSION
+
+Ce travail a permis de mettre en lumière l’existence d’une discrimination contre les immigrants au Québec tant au niveau de l’accès à l’emploi que de la rémunération salariale. Ces derniers sont donc doublement défavorisés sur le marché du travail.
+
+Au niveau de l’accès à l’emploi, la situation est plus compliquée pour les immigrants comparés aux natifs. En effet, les immigrants ont deux fois plus de chance de se retrouver au chômage. Par ailleurs, un immigrant chômeur a 2,4 fois plus de chance d’expérimenter un chômage longue durée (au moins 12 mois) par rapport à un natif. Les probabilités de chômage long observées dans le groupe des immigrants et des natifs chômeurs sont respectivement 18,5% et 9,2%. Or la probabilité chez les immigrants devait être de 10,3% si leurs caractéristiques étaient valorisées comme celles des natifs. On n’arrive donc à expliquer ce surplus de probabilité de chômage long de 8,2% chez les immigrants chômeurs que par une discrimination purement négative à l’encontre de ces derniers.
+
+Au niveau de la rémunération salariale, un immigrant gagne environ 10% de moins qu’un natif à compétence égale, soit environ 3,2\$/h de moins. Il s’agit là d’un acte de discrimination. En moyenne, un immigrant gagne 29,5\$/h contre 30,3%/h pour un natif, ce qui correspond à un écart observé de 0,8\$/h. En prenant les natifs comme référence pour la valorisation des caractéristiques, nous voyons que le salaire moyen des immigrants devrait être de 32,9\$/h compte tenu des caractéristiques de leur groupe versus celles des natifs. Ce surplus contrefactuel de 2,6\$/h s’expliquerait par les avantages que les immigrants retireraient notamment de leur plus grande proportion d’individus ayant un niveau d’éducation élevé et de travailleurs dans le secteur des Sciences naturelles et appliquées. Il y a donc un écart inexpliqué de 3,4\$ entre le salaire horaire moyen que les immigrants auraient dû percevoir et ce qu’ils perçoivent dans la réalité.
+
+Dans la vision d’un monde équitable et juste, les résultats de ce travail appellent à un renforcement des politiques d’insertion professionnelle et de lutte contre les discriminations envers les immigrants au Québec.
+
 
 # BIBLIOGRAPHIE
