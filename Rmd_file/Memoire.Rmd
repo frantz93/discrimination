@@ -7,9 +7,14 @@ output:
   html_document:
     toc: TRUE
     number_sections: TRUE
+    fig_caption: true
   pdf_document: 
     toc: TRUE
     number_sections: TRUE
+    fig_caption: true
+    #latex_engine: xelatex
+header-includes:
+  \usepackage{caption}
 bibliography: references.bib
 link-citations: yes
 ---
@@ -21,11 +26,15 @@ library(tidyverse)
 library(knitr)
 library(flextable)
 library(kableExtra)
+library(FactoMineR)
+library(ggplot2)
+library(ggthemes)
+set_flextable_defaults(fonts_ignore = TRUE)
 ```
 
 # RESUMÉ {.unnumbered}
 
-Cette étude fait une comparaison entre les immigrants et les natifs dans la province du Québec au Canada, en ce qui a trait à l'accès à l'emploi et à la rémunération salariale. L'accès à l'emploi est mesuré en termes de probabilité de chômage longue durée (soit un minimum de 12 mois) et la rémunération en termes de salaire horaire perçu par l'individu. Nous utilisons pour cela des méthodes de régression linéaire et logistique ainsi que des méthodes de décomposition des inégalités observées entre les groupes (méthode Oaxaca-Blinder et méthode Fairlie). Les [**résultats**]{style="color:blue"} \textcolor{blue}{\bf{résultats}} de notre recherche prouvent l'existence d'une discrimination à l'encontre des immigrants tant au niveau de l'accès à l'emploi que de la rémunération. Au niveau de l'accès à l'emploi, un immigrant chômeur a 2,4 fois plus de chance d'expérimenter un chômage longue durée (au moins 12 mois) par rapport à un natif. Il y a un surplus de probabilité de chômage long de 8,2% chez les immigrants chômeurs qui ne s'explique par une discrimination purement négative contre ces derniers. Au niveau de la rémunération, l'immigrant moyen gagne un salaire horaire environ 10% inférieur à celui d'un natif, toutes choses égales par ailleurs. Il y a un écart inexpliqué de 3,4\$ entre le salaire horaire moyen que les immigrants auraient dû recevoir et ce qu'ils reçoivent dans la réalité. Ces résultats appellent à un renforcement des politiques d'insertion professionnelle et de lutte contre les discriminations à l'endroit des immigrants au Québec.
+Cette étude fait une comparaison entre les immigrants et les natifs dans la province du Québec au Canada, en ce qui a trait à l'accès à l'emploi et à la rémunération salariale. L'accès à l'emploi est mesuré en termes de probabilité de chômage longue durée (soit un minimum de 12 mois) et la rémunération en termes de salaire horaire perçu par l'individu. Nous utilisons pour cela des méthodes de régression linéaire et logistique ainsi que des méthodes de décomposition des inégalités observées entre les groupes (méthode Oaxaca-Blinder et méthode Fairlie). Les [**résultats**]{style="color:blue"} de notre recherche prouvent l'existence d'une discrimination à l'encontre des immigrants tant au niveau de l'accès à l'emploi que de la rémunération. Au niveau de l'accès à l'emploi, un immigrant chômeur a 2,4 fois plus de chance d'expérimenter un chômage longue durée (au moins 12 mois) par rapport à un natif. Il y a un surplus de probabilité de chômage long de 8,2% chez les immigrants chômeurs qui ne s'explique par une discrimination purement négative contre ces derniers. Au niveau de la rémunération, l'immigrant moyen gagne un salaire horaire environ 10% inférieur à celui d'un natif, toutes choses égales par ailleurs. Il y a un écart inexpliqué de 3,4\$ entre le salaire horaire moyen que les immigrants auraient dû recevoir et ce qu'ils reçoivent dans la réalité. Ces résultats appellent à un renforcement des politiques d'insertion professionnelle et de lutte contre les discriminations à l'endroit des immigrants au Québec.
 
 # INTRODUCTION
 
@@ -170,7 +179,7 @@ $Ln\left( \frac{p \left( 1 \mid X \right)}{1 - p \left( 1 \mid X \right)} \right
 
 Où $p \left( 1 \mid X \right)$ désigne la probabilité d'être en chômage longue durée.
 
-Cette régression mobilise une loi logistique pour estimer les variations dans la probabilité de tomber en situation de chômage long. Sur R, la régression logistique est réalisée à l'aide de la commande : `glm (formula, data, family = binomial(link="logit"))`\`.
+Cette régression mobilise une loi logistique pour estimer les variations dans la probabilité de tomber en situation de chômage long. Sur R, la régression logistique est réalisée à l'aide de la commande : `glm (formula, data, family = binomial(link="logit"))`.
 
 ### Décomposition des probabilités de chômage long : méthode Fairlie
 
@@ -204,35 +213,57 @@ stat3 <- data.frame(variable = c("SAL","YRS.TENURE"), moy = c(mean(SAL, na.rm=TR
 
 kables(list(kable(stat1) %>% kable_styling(), list(kable(stat2) %>% kable_styling(), kable(stat3) %>% kable_styling())), caption = "Statistique descriptive") %>% kable_styling()
 
+#kable(list(stat1, stat2, stat3), caption = 'Statistique descriptive', booktabs = TRUE, valign = 't')   #for fitting PDF doc
 ```
 
 ### Analyse en composantes multiples
 
-Nous testons l’existence d’interrelation entre les variables de notre base de données par une analyse factorielle en composante multiples (ACM). Nous utilisons pour cela la librairie FactoMineR sur R. Les variables d’identité individuelle (genre, âge, statut matrimonial, éducation et statut d’immigrant) sont retenues comme variables fondamentales constituant les dimensions du repère alors que les autres variables catégorielles sont identifiées comme variables qualitatives supplémentaires. Nous représentons aux Figure 2 et Figure 1 ci-dessous les coordonnées respectives des variables supplémentaires et des variables fondamentales les mieux projetées sur les deux premières dimensions du repère.
+Nous testons l’existence d’interrelation entre les variables de notre base de données par une analyse factorielle en composante multiples (ACM). Nous utilisons pour cela la librairie FactoMineR sur R. Les variables d’identité individuelle (genre, âge, statut matrimonial, éducation et statut d’immigrant) sont retenues comme variables fondamentales constituant les dimensions du repère alors que les autres variables catégorielles sont identifiées comme variables qualitatives supplémentaires. Nous représentons aux Figure 1 et Figure 2 ci-dessous les coordonnées respectives des variables supplémentaires et des variables fondamentales les mieux projetées sur les deux premières dimensions du repère.
 
-````{r acm}
+````{r acm1}
+varACM <- subset.data.frame(baseQC, 
+                            select = c("WOMAN", "YOUNG", "MARRIED", "EDUC.LEVEL", "IMMIGRANT", "SELF.EMP", "SYNDIC", "OCCUP.SEC",
+                                       "PART.TIME", "LARGFIRM", "ISPAID", "ISUNEMP", "LONG.UNEMP", "YRS.TENURE", "SAL"))
+res.mca <- MCA(varACM, quali.sup = c(6:13), quanti.sup = c(14, 15), graph = FALSE)
+
+plot(res.mca, invisible = c("ind", "var"), habillage = "quali", cex = 0.9, selectMod = "cos2 20", title = "Représentation des variables qualitatives supplémentaires dans le plan ACM")
 
 ````
 
 Nous pouvons établir l’existence d’une relation potentielle entre les variables qui se rapprochent dans une même partie du cadrant. Nous voyons ainsi à la Figure 2 que les travailleurs à temps partiels se retrouvent le plus souvent dans les professions des ventes et services, alors que ceux à temps plein sont souvent dans le secteur « Affaires, finance et administration » et sont couverts par un syndicat. Généralement, ces travailleurs à temps plein sont aussi des adultes âgés de 30 ans ou plus (voir la Figure 9 en annexe). Par ailleurs, les travailleurs dans le secteur de la santé ont le plus souvent le statut d’employé. La Figure 1 montre des relations moins fortes entre les variables fondamentales. Nous pouvons en déduire que les natifs sont le plus souvent des hommes avec un peu plus souvent un niveau d’éducation moyen, alors que les immigrants ont un peu plus souvent un niveau élevé d’éducation. La superposition des deux figures montre également que les natifs se retrouvent le souvent à travailler dans les professions des « Métiers, transport, machinerie et domaines apparentés » (voir la Figure 9 en annexe).
 
+````{r acm2}
+plot(res.mca, invisible = c("ind", "quali.sup"), habillage = "quali", cex = 0.9, selectMod = "cos2 20", title = "Représentation des variables fondamentales dans le plan ACM")
+
+````
 
 Il est également possible de représenter les variables quantitatives dans le plan d’analyse en composante multiple. Les variables du salaire et de l’expérience au travail sont représentées à la Figure 8 en annexe. Ces variables se projettent dans un même sens et dans un même cadrant. Il y a donc une corrélation entre le nombre d’année d’expérience6 au travail et le salaire.
 
 ### Analyse comparative : immigrants vs natifs
 
-L’analyse comparative entre immigrants et natifs québécois peut être initiée par une étude des statistiques descriptives des sous-échantillons dans chacune de ces catégories. Les données figurant au Tableau 9 en annexe montrent que par rapport aux natifs, il y a parmi les immigrants une plus grande proportion de mariés, de personnes ayant un niveau d’éducation élevée, et de travailleurs affiliés aux grandes entreprises. Les personnes au chômage et les chômeurs longue durée constituent également des proportions plus élevées dans la catégorie des immigrants. En ce qui concerne les catégories professionnelles, les immigrants sont plutôt mieux répartis dans les professions des secteurs : « Affaires, finance et administration », « Sciences naturelles et appliquées et domaines apparentés », « Santé », « Fabrication et services d'utilité publique ».
+L’analyse comparative entre immigrants et natifs peut être initiée par un examen des distributions de nos variables d'intérêt dans chaque sous-échantillon. En examinant les figures ci-dessous, nous voyons que les immigrants sont relativement plus concentrés dans la catégorie des bas salaires (<30 \$/h) notamment dans la tranche des salaires allant de 14 à 29 \$h. Parallèlement, les natifs sont en proportion relativement plus élevée dans la catégorie des hauts salaires (<30 \$/h) et en particulier dans la tranche allant de 30 à 52 \$/h.
 
-Notre base de données comprend deux variables quantitatives : l’expérience au travail et le salaire. Nous comparons les distributions de ces variables dans les catégories des immigrants et des natifs. La Figure 3 montre que la distribution des salaires est beaucoup plus dispersée chez les immigrants comparativement aux natifs. Les inégalités salariales sont donc plus prononcées parmi les immigrants. En outre, nous observons que le salaire moyen est plus faible dans le groupe des immigrants (29,5$) comparativement aux natifs (30,3$). Dans la Figure 4, nous voyons que le nombre d’année d’expérience au travail est également plus faible dans le groupe des immigrants (6,4 vs 8,1 chez les natifs). Les détails sur les tests de moyenne sont donnés en annexe (Figure 7).
+Notre base de données comprend deux variables quantitatives : l’expérience au travail et le salaire. Nous comparons les distributions de ces variables dans les catégories des immigrants et des natifs. La Figure 3 montre que la distribution des salaires est beaucoup plus dispersée chez les immigrants comparativement aux natifs. Les inégalités salariales sont donc plus prononcées parmi les immigrants. En outre, nous observons que le salaire moyen est plus faible dans le groupe des immigrants (29.5\$) comparativement aux natifs (30.3\$). Dans la Figure 4, nous voyons que le nombre d’année d’expérience au travail est également plus faible dans le groupe des immigrants (6.4 vs 8.1 chez les natifs). Les détails sur les tests de moyenne sont donnés en annexe (Figure 7).
 
-````{r acomp1}
+````{r acomp1, fig.show="hold", out.width="50%"}
 
+p0 <- baseQC %>% group_by(IMMIGRANT) %>% ggplot(aes(IMMIGRANT,SAL, fill = IMMIGRANT))
+p0 + geom_boxplot() + labs(title = "Distribution des salaires (boîtes à moustaches)", caption = "©FRPDJ, Source:StatCan") + theme_fivethirtyeight() + theme(legend.position="none") + scale_x_discrete(name="", labels=c("Born in Canada", "Immigrant"))
+
+p1 <- baseQC %>% group_by(IMMIGRANT) %>% ggplot(aes(SAL, fill = IMMIGRANT))
+p1 + geom_density(alpha=0.2, bw=2, position = "nudge") + scale_fill_discrete(name = "", labels = c("Born in Canada", "Immigrant")) + labs(title = "Distribution des salaires (courbes de densité)", caption = "©FRPDJ, Source:StatCan") + theme_fivethirtyeight() + scale_x_continuous(breaks = c(0,9,14,30,52,65,92))
+````
+
+````{r testmoy}
+tmoy <- t.test(baseQC$SAL ~ baseQC$IMMIGRANT)
+print(paste("ttest : p-value = ", round(tmoy$p.value, 4)))
 ````
 
 L’écart de salaire observé entre immigrants et natifs peut être dû à l’influence de facteurs autre que le statut d’immigrant. A ce stade, nous ne pouvons donc pas affirmer qu’un immigrant gagne moins qu’un natif. A la prochaine section, nous allons vérifier l’influence du statut d’immigrant sur le salaire en contrôlant l’effet d’autres variables dans un modèle économétrique.
 
 ````{r acomp2}
-
+#plotmeans(baseQC$YRS.TENURE ~ baseQC$IMMIGRANT, p = 0.95, connect = FALSE, bars = TRUE, xlab = "Immigrant", ylab = "Expérience dans le poste (années)")
+#t.test(baseQC$YRS.TENURE ~ baseQC$IMMIGRANT)
 ````
 
 ## Mesure de la discrimination salariale
@@ -240,7 +271,7 @@ L’écart de salaire observé entre immigrants et natifs peut être dû à l’
 Nous allons ici mesurer l’influence du statut d’immigrant sur la rémunération salariale des individus en tenant compte de l’effet possible d’autres facteurs. Dans un premier temps, nous estimons un modèle de régression multiple avec comme variable dépendante le logarithme des salaires. Nous appliquons ensuite la méthode Oaxaca pour décomposer les écarts de salaires mesurés entre les groupes des immigrants et des natifs.
 
 ### Estimations par régression linéaire
-Le Tableau 3 présente les coefficients estimés de la régression. L’effet de chaque variable sur le salaire est calculé en pourcentage dans la colonne « Effects ». Avec un R2 ajusté de plus de 50%, le pouvoir explicatif de ce modèle est assez intéressant. Tous les coefficients des variables indépendantes sont significatifs au seuil α = 0,1. Les résultats des estimations montrent qu’un immigrant québécois gagne environ 10% de moins qu’un natif toute chose étant égale par ailleurs. Ce pourcentage équivaut à un écart d’environ 3,2 $ en faveur des natifs (voir le Tableau 10 en annexe). Il y a donc de la discrimination salariale en faveur des natifs. Le modèle indique par ailleurs que l’âge jeune (-30 ans), le genre (femme), le statut de travailleur autonome et le travail à temps partiel ont un effet négatif sur le niveau de salaire perçu par les individus, alors que toutes les autres variables ont une influence positive sur le salaire.
+Le Tableau 3 présente les coefficients estimés de la régression. L’effet de chaque variable sur le salaire est calculé en pourcentage dans la colonne « Effects ». Avec un R2 ajusté de plus de 50%, le pouvoir explicatif de ce modèle est assez intéressant. Tous les coefficients des variables indépendantes sont significatifs au seuil $\alpha = 0.1$. Les résultats des estimations montrent qu’un immigrant québécois gagne environ 10% de moins qu’un natif toute chose étant égale par ailleurs. Ce pourcentage équivaut à un écart d’environ 3,2 \$ en faveur des natifs (voir le Tableau 10 en annexe). Il y a donc de la discrimination salariale en faveur des natifs. Le modèle indique par ailleurs que l’âge jeune (-30 ans), le genre (femme), le statut de travailleur autonome et le travail à temps partiel ont un effet négatif sur le niveau de salaire perçu par les individus, alors que toutes les autres variables ont une influence positive sur le salaire.
 
 Considérant l’influence des autres variables sur le salaire et tenant compte des inégalités de répartition des échantillons d’immigrants et de natifs dans chacune de ces variables, nous supposons que la discrimination salariale (immigrants vs natifs) est due en partie aux différences de caractéristiques entre les deux groupes. C’est cet aspect que nous allons approfondir à la section 3.1.2.
 
@@ -274,7 +305,7 @@ La décomposition Oaxaca permet d’obtenir également un graphique sur la parti
 
 ## Mesure de la discrimination dans l’accès à l’emploi
 
-Nous avons vu que les immigrants sont défavorisés sur le marché du travail québécois en ce qui a trait à la rémunération. Nous nous interrogeons à présent sur leur situation en termes d’accès à l’emploi. Est-ce que les immigrants arrivent à trouver un emploi aussi rapidement que les natifs ? Les résultats au tableau de contingence en annexe (Tableau 6) nous montraient que la proportion des chômeurs longue durée (t ≥ 12 mois) est significativement plus élevée parmi les immigrants que parmi les natifs. Nous devons néanmoins contrôler l’effet d’autres facteurs afin de pouvoir établir l’influence du statut d’immigrant sur la probabilité d’être en chômage long. Ci-dessous, nous présentons les résultats du modèle de régression de la probabilité de chômage. Nous utilisons ensuite la méthode de Fairlie afin de décomposer de l’écart observé entre les deux groupes.
+Nous avons vu que les immigrants sont défavorisés sur le marché du travail québécois en ce qui a trait à la rémunération. Nous nous interrogeons à présent sur leur situation en termes d’accès à l’emploi. Est-ce que les immigrants arrivent à trouver un emploi aussi rapidement que les natifs ? Les résultats au tableau de contingence en annexe (Tableau 6) nous montraient que la proportion des chômeurs longue durée ($t \geq 12$ mois) est significativement plus élevée parmi les immigrants que parmi les natifs. Nous devons néanmoins contrôler l’effet d’autres facteurs afin de pouvoir établir l’influence du statut d’immigrant sur la probabilité d’être en chômage long. Ci-dessous, nous présentons les résultats du modèle de régression de la probabilité de chômage. Nous utilisons ensuite la méthode de Fairlie afin de décomposer de l’écart observé entre les deux groupes.
 
 ### Estimations par régression logistique
 
