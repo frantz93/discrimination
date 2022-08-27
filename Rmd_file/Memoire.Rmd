@@ -21,7 +21,7 @@ link-citations: yes
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo=FALSE, message=FALSE, warning=FALSE)
-options(digits = 4/2, scipen = 00)
+options(digits = 8/2, scipen = 00)
 library(tidyverse)
 library(knitr)
 library(flextable)
@@ -29,6 +29,7 @@ library(kableExtra)
 library(FactoMineR)
 library(ggplot2)
 library(ggthemes)
+library(scales)
 set_flextable_defaults(fonts_ignore = TRUE)
 ```
 
@@ -241,27 +242,55 @@ Il est également possible de représenter les variables quantitatives dans le p
 
 ### Analyse comparative : immigrants vs natifs
 
-L’analyse comparative entre immigrants et natifs peut être initiée par un examen des distributions de nos variables d'intérêt dans chaque sous-échantillon. En examinant les figures ci-dessous, nous voyons que les immigrants sont relativement plus concentrés dans la catégorie des bas salaires (<30 \$/h) notamment dans la tranche des salaires allant de 14 à 29 \$h. Parallèlement, les natifs sont en proportion relativement plus élevée dans la catégorie des hauts salaires (<30 \$/h) et en particulier dans la tranche allant de 30 à 52 \$/h.
+````{r test}
+mean_nat <- round(mean(baseQC$SAL[IMMIGRANT==0], na.rm = TRUE), 1)
+mean_im <- round(mean(baseQC$SAL[IMMIGRANT==1], na.rm = TRUE), 1)
+med_nat <- round(median(baseQC$SAL[IMMIGRANT==0], na.rm = TRUE), 1)
+med_im <- round(median(baseQC$SAL[IMMIGRANT==1], na.rm = TRUE), 1)
+tmoy <- t.test(baseQC$SAL ~ baseQC$IMMIGRANT)
+````
 
-Notre base de données comprend deux variables quantitatives : l’expérience au travail et le salaire. Nous comparons les distributions de ces variables dans les catégories des immigrants et des natifs. La Figure 3 montre que la distribution des salaires est beaucoup plus dispersée chez les immigrants comparativement aux natifs. Les inégalités salariales sont donc plus prononcées parmi les immigrants. En outre, nous observons que le salaire moyen est plus faible dans le groupe des immigrants (29.5\$) comparativement aux natifs (30.3\$). Dans la Figure 4, nous voyons que le nombre d’année d’expérience au travail est également plus faible dans le groupe des immigrants (6.4 vs 8.1 chez les natifs). Les détails sur les tests de moyenne sont donnés en annexe (Figure 7).
+L’analyse comparative entre immigrants et natifs peut être initiée par un examen des distributions de nos variables d'intérêt dans chaque sous-échantillon. En examinant les figures ci-dessous, nous voyons que les immigrants sont relativement plus concentrés dans la catégorie des bas salaires (<30 \$/h) notamment dans la tranche des salaires allant de 14 à 29 \$h. Parallèlement, les natifs sont en proportion relativement plus élevée dans la catégorie des hauts salaires (>30 \$/h) et en particulier dans la tranche des 30 à 52 \$/h. Nous voyons également que les distributions sont centrées à gauche, ce qui veut dire que la majorité des individus gagnent un salaire inférieur à la moyenne de leur groupe. Le salaire moyen dans la catégorie des immigrants est légèrement inférieur celui des natifs (`r mean_im` vs `r mean_nat`). L'écart observé est statistiquement significatif ($\alpha < 0.05$), mais il peut être dû d'autres facteurs non contrôlés. A ce stade, nous ne pouvons pas affirmer qu’un immigrant gagne moins qu’un natif.
 
 ````{r acomp1, fig.show="hold", out.width="50%"}
-
 p0 <- baseQC %>% group_by(IMMIGRANT) %>% ggplot(aes(IMMIGRANT,SAL, fill = IMMIGRANT))
-p0 + geom_boxplot() + labs(title = "Distribution des salaires (boîtes à moustaches)", caption = "©FRPDJ, Source:StatCan") + theme_fivethirtyeight() + theme(legend.position="none") + scale_x_discrete(name="", labels=c("Born in Canada", "Immigrant"))
+p0 + geom_boxplot() + labs(title = "Distribution des salaires (boîtes à moustaches)", caption = "©FRPDJ, Source:StatCan") + theme_fivethirtyeight() + theme(legend.position="none") + scale_x_discrete(name="", labels=c("Canadian born", "Immigrant")) + geom_hline(yintercept = mean_nat, col = "red") +
+  geom_text(aes(x=0.51, y=mean_nat+2, label="mean CB", col="c")) + geom_hline(yintercept = mean_im, col = "blue") + 
+  geom_text(aes(x=2.5, y=mean_im-2, label="mean IM", col="i"))
 
 p1 <- baseQC %>% group_by(IMMIGRANT) %>% ggplot(aes(SAL, fill = IMMIGRANT))
-p1 + geom_density(alpha=0.2, bw=2, position = "nudge") + scale_fill_discrete(name = "", labels = c("Born in Canada", "Immigrant")) + labs(title = "Distribution des salaires (courbes de densité)", caption = "©FRPDJ, Source:StatCan") + theme_fivethirtyeight() + scale_x_continuous(breaks = c(0,9,14,30,52,65,92))
+p1 + geom_density(alpha=0.2, bw=2, position = "nudge") + scale_fill_discrete(name = "", labels = c("Canadian born", "Immigrant")) + labs(title = "Distribution des salaires (courbes de densité)", caption = "©FRPDJ, Source:StatCan") + theme_fivethirtyeight() + scale_x_continuous(breaks = c(0,9,14,30,52,65,92))
 ````
 
 ````{r testmoy}
-tmoy <- t.test(baseQC$SAL ~ baseQC$IMMIGRANT)
 print(paste("ttest : p-value = ", round(tmoy$p.value, 4)))
 ````
 
-L’écart de salaire observé entre immigrants et natifs peut être dû à l’influence de facteurs autre que le statut d’immigrant. A ce stade, nous ne pouvons donc pas affirmer qu’un immigrant gagne moins qu’un natif. A la prochaine section, nous allons vérifier l’influence du statut d’immigrant sur le salaire en contrôlant l’effet d’autres variables dans un modèle économétrique.
+````{r}
+chom <- baseQC %>% group_by(IMMIGRANT, ISUNEMP) %>% summarise(n = n()) %>% group_by(IMMIGRANT) %>% summarise(ISUNEMP = ISUNEMP, n = n, prop = n/sum(n)) %>% filter(ISUNEMP==1)
 
-````{r acomp2}
+rc_nat <- chom %>% filter(IMMIGRANT==0) %>% .$prop %>% percent()
+rc_im <- chom %>% filter(IMMIGRANT==1) %>% .$prop %>% percent()
+
+long.chom <- baseQC %>% group_by(IMMIGRANT, LONG.UNEMP) %>% summarise(n = n()) %>% group_by(IMMIGRANT) %>% summarise(LONG.UNEMP = LONG.UNEMP, n = n, prop = n/sum(n)) %>% filter(LONG.UNEMP==1)
+
+rlc_nat <- long.chom %>% filter(IMMIGRANT==0) %>% .$prop %>% percent(0.1)
+rlc_im <- long.chom %>% filter(IMMIGRANT==1) %>% .$prop %>% percent(0.1)
+````
+
+La figure ci-dessous compare les proportions de natifs et d'immigrants au chômage. Plus d'immigrants se retrouvent au chômage par rapport au natifs (`r rc_im` vs `r rc_nat`). En outre, les imigrants au chômage longue durée sont en proportion relativement plus élevée comparés au natifs (`r rlc_im` vs `r rlc_nat`). Toutefois, cela ne nous permet pas d'affirmer qu'un immigrant peut plus facilement se retrouver au chômage ou au chômage longue durée sans contrôler l'effet des autres variables qui peuvent influencer la propabilité qu'un individu se trouve dans de telles situations.
+
+````{r acomp2, out.width="50%"}
+p2 <- chom %>% ggplot()
+p2 + geom_bar(data = chom, aes(IMMIGRANT, prop, fill = "UNEMP"), stat = "identity", width = 0.9) + 
+  geom_bar(data = long.chom, aes(IMMIGRANT, prop, fill = "LONG UNEMP"), col = "gray", stat = "identity", width = 0.9) + 
+  scale_fill_manual(name='', breaks=c('UNEMP', 'LONG UNEMP'), values=c('UNEMP'='#E69F00', 'LONG UNEMP'='#D55E00')) +
+  labs(title = "Proportion d'individus au chômage", caption = "©FRPDJ, Source:StatCan") + theme_fivethirtyeight() +
+  scale_x_discrete(name="", labels=c("Canadian born", "Immigrant"))
+````
+
+
+````{r acomp3}
 #plotmeans(baseQC$YRS.TENURE ~ baseQC$IMMIGRANT, p = 0.95, connect = FALSE, bars = TRUE, xlab = "Immigrant", ylab = "Expérience dans le poste (années)")
 #t.test(baseQC$YRS.TENURE ~ baseQC$IMMIGRANT)
 ````
@@ -279,7 +308,7 @@ Considérant l’influence des autres variables sur le salaire et tenant compte 
 
 ````
 
-### Décomposition de l’écart de salaire (immigrants vs non immigrants)
+### Décomposition de l’écart de salaire (immigrants vs natifs)
 Le Tableau 4 présente les résultats de la décomposition de l’écart salarial observé entre le groupe des non immigrants (A) et celui des immigrants (B). La première colonne donne la répartition des deux groupes dans l’échantillon alors que les moyennes de salaire associées à chaque groupe figurent dans la deuxième colonne. Nous observons une différence de salaire horaire de 0,83\$ en faveur des natifs (\$y.diff). Cet écart peut être décomposé suivant les données inscrites dans les deux dernières colonnes : -2,62\$ peuvent être expliqués par le modèle dont 63% (-1,63\$) sont dues à la stricte dotation en caractéristiques différentes entre les groupes et 37% (-0,99\$) aux interactions entre les caractéristiques et leur valorisation sur le marché; 3,44$ d’écart reste inexpliqué, ce qui peut être considéré comme une discrimination salariale pure.
 En prenant les natifs comme situation de référence, l’analyse des résultats de la décomposition indique que compte tenu des différences de caractéristiques (immigrants vs les natifs) et des interactions, on devrait en principe observer un salaire moyen de 32,9\$/h. Cela correspondrait à un écart salarial de 2,6\$ en faveur des immigrants. Or l’écart observé est plutôt de 0,8\$ en faveur des natifs. Cela explique la discrimination de 3,4$ en faveur des natifs.
 
