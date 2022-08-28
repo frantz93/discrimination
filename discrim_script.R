@@ -77,7 +77,7 @@ plot(res.mca, invisible = c("ind", "var"), habillage = "quali", cex = 0.9, selec
 plot(res.mca, invisible = "ind", autoLab = "y", cex = 0.8, habillage = "quali", selectMod = "cos2 10")
 plot(res.mca, choix = "quanti.sup")
 plot(res.mca, choix = "var", xlim = c(0, 0.5), ylim = c(0, 0.6))
-
+plot
 summary(res.mca)
 
 cor(baseQC$SAL, baseQC$YRS.TENURE, use = "complete.obs")
