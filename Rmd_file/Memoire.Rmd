@@ -272,10 +272,10 @@ chom <- baseQC %>% group_by(IMMIGRANT, ISUNEMP) %>% summarise(n = n()) %>% group
 rc_nat <- chom %>% filter(IMMIGRANT==0) %>% .$prop %>% percent()
 rc_im <- chom %>% filter(IMMIGRANT==1) %>% .$prop %>% percent()
 
-long.chom <- baseQC %>% group_by(IMMIGRANT, LONG.UNEMP) %>% summarise(n = n()) %>% group_by(IMMIGRANT) %>% summarise(LONG.UNEMP = LONG.UNEMP, n = n, prop = n/sum(n)) %>% filter(LONG.UNEMP==1)
+lchom <- baseQC %>% group_by(IMMIGRANT, LONG.UNEMP) %>% summarise(n = n()) %>% group_by(IMMIGRANT) %>% summarise(LONG.UNEMP = LONG.UNEMP, n = n, prop = n/sum(n)) %>% filter(LONG.UNEMP==1)
 
-rlc_nat <- long.chom %>% filter(IMMIGRANT==0) %>% .$prop %>% percent(0.1)
-rlc_im <- long.chom %>% filter(IMMIGRANT==1) %>% .$prop %>% percent(0.1)
+rlc_nat <- lchom %>% filter(IMMIGRANT==0) %>% .$prop %>% percent(0.1)
+rlc_im <- lchom %>% filter(IMMIGRANT==1) %>% .$prop %>% percent(0.1)
 ````
 
 La figure ci-dessous compare les proportions de natifs et d'immigrants au chômage. Plus d'immigrants se retrouvent au chômage par rapport au natifs (`r rc_im` vs `r rc_nat`). En outre, les imigrants au chômage longue durée sont en proportion relativement plus élevée comparés au natifs (`r rlc_im` vs `r rlc_nat`). Toutefois, cela ne nous permet pas d'affirmer qu'un immigrant peut plus facilement se retrouver au chômage ou au chômage longue durée sans contrôler l'effet des autres variables qui peuvent influencer la propabilité qu'un individu se trouve dans de telles situations.
@@ -287,12 +287,10 @@ p2 + geom_bar(data = chom, aes(IMMIGRANT, prop, fill = "UNEMP"), stat = "identit
   scale_fill_manual(name='', breaks=c('UNEMP', 'LONG UNEMP'), values=c('UNEMP'='#E69F00', 'LONG UNEMP'='#D55E00')) +
   labs(title = "Proportion d'individus au chômage", caption = "©FRPDJ, Source:StatCan") + theme_fivethirtyeight() +
   scale_x_discrete(name="", labels=c("Canadian born", "Immigrant"))
-````
-
-
-````{r acomp3}
-#plotmeans(baseQC$YRS.TENURE ~ baseQC$IMMIGRANT, p = 0.95, connect = FALSE, bars = TRUE, xlab = "Immigrant", ylab = "Expérience dans le poste (années)")
-#t.test(baseQC$YRS.TENURE ~ baseQC$IMMIGRANT)
+x2_chom <- chisq.test(baseQC$IMMIGRANT, baseQC$ISUNEMP)
+x2_lchom <- chisq.test(baseQC$IMMIGRANT, baseQC$LONG.UNEMP)
+x2_chom$p.value
+x2_lchom$p.value
 ````
 
 ## Mesure de la discrimination salariale
@@ -300,7 +298,7 @@ p2 + geom_bar(data = chom, aes(IMMIGRANT, prop, fill = "UNEMP"), stat = "identit
 Nous allons ici mesurer l’influence du statut d’immigrant sur la rémunération salariale des individus en tenant compte de l’effet possible d’autres facteurs. Dans un premier temps, nous estimons un modèle de régression multiple avec comme variable dépendante le logarithme des salaires. Nous appliquons ensuite la méthode Oaxaca pour décomposer les écarts de salaires mesurés entre les groupes des immigrants et des natifs.
 
 ### Estimations par régression linéaire
-Le Tableau 3 présente les coefficients estimés de la régression. L’effet de chaque variable sur le salaire est calculé en pourcentage dans la colonne « Effects ». Avec un R2 ajusté de plus de 50%, le pouvoir explicatif de ce modèle est assez intéressant. Tous les coefficients des variables indépendantes sont significatifs au seuil $\alpha = 0.1$. Les résultats des estimations montrent qu’un immigrant québécois gagne environ 10% de moins qu’un natif toute chose étant égale par ailleurs. Ce pourcentage équivaut à un écart d’environ 3,2 \$ en faveur des natifs (voir le Tableau 10 en annexe). Il y a donc de la discrimination salariale en faveur des natifs. Le modèle indique par ailleurs que l’âge jeune (-30 ans), le genre (femme), le statut de travailleur autonome et le travail à temps partiel ont un effet négatif sur le niveau de salaire perçu par les individus, alors que toutes les autres variables ont une influence positive sur le salaire.
+Le [Tableau 3]{style="color:red"} présente les coefficients estimés de la régression. L’effet de chaque variable sur le salaire est calculé en pourcentage dans la colonne « Effects ». Avec un R2 ajusté de plus de 50%, le pouvoir explicatif de ce modèle est assez intéressant. Tous les coefficients des variables indépendantes sont significatifs au seuil $\alpha = 0.1$. Les résultats des estimations montrent qu’un immigrant québécois gagne environ 10% de moins qu’un natif toute chose étant égale par ailleurs. Ce pourcentage équivaut à un écart d’environ 3,2 \$ en faveur des natifs (voir le Tableau 10 en annexe). Il y a donc de la discrimination salariale en faveur des natifs. Le modèle indique par ailleurs que l’âge jeune (-30 ans), le genre (femme), le statut de travailleur autonome et le travail à temps partiel ont un effet négatif sur le niveau de salaire perçu par les individus, alors que toutes les autres variables ont une influence positive sur le salaire.
 
 Considérant l’influence des autres variables sur le salaire et tenant compte des inégalités de répartition des échantillons d’immigrants et de natifs dans chacune de ces variables, nous supposons que la discrimination salariale (immigrants vs natifs) est due en partie aux différences de caractéristiques entre les deux groupes. C’est cet aspect que nous allons approfondir à la section 3.1.2.
 
