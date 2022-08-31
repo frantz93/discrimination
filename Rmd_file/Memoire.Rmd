@@ -19,6 +19,14 @@ bibliography: references.bib
 link-citations: yes
 ---
 
+```{sql}
+#| connection = con
+SELECT episode, title
+FROM "ivelasq3/elements"."elements"
+LIMIT 3
+```
+
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo=FALSE, message=FALSE, warning=FALSE)
 options(digits = 8/2, scipen = 00)
