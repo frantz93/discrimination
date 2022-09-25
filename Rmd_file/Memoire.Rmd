@@ -31,6 +31,7 @@ library(ggplot2)
 library(ggthemes)
 library(scales)
 library(gridExtra)
+library(oaxaca)
 set_flextable_defaults(fonts_ignore = TRUE)
 ```
 
@@ -167,7 +168,7 @@ La régression par la méthode OLS permet d'estimer les variations en pourcentag
 
 ### Décomposition des inégalités salariaux : méthode Oaxaca
 
-La méthode Oaxaca-Blinder est la méthode la plus classique utilisée en économétrie pour décomposer les inégalités mesurées entre deux groupes pour une variable donnée [@insee2019]. Elle est facilement applicable lorsque la variable d'intérêt est continue comme dans le cas du salaire. Cette méthode décompose l'écart observé entre les moyennes mesurées dans chaque groupe en deux parties : une partie expliquée par les différences de caractéristiques entre les groupes et une partie inexpliquée. Dans notre cas actuel où la mesure porte sur l'écart de salaire entre les immigrants et les natifs, la partie inexpliquée de l'écart observé correspondra à une discrimination salariale pure en faveur d'un groupe et en défaveur d'un autre groupe. L'équation de la décomposition par la méthode Oaxaca est la suivante :
+La méthode Oaxaca-Blinder est la méthode la plus classique utilisée en économétrie pour décomposer les inégalités mesurées entre deux groupes pour une variable donnée [@insee2019; @hlavac2022]. Elle est facilement applicable lorsque la variable d'intérêt est continue comme dans le cas du salaire. Cette méthode décompose l'écart observé entre les moyennes mesurées dans chaque groupe en deux parties : une partie expliquée par les différences de caractéristiques entre les groupes et une partie inexpliquée. Dans notre cas actuel où la mesure porte sur l'écart de salaire entre les immigrants et les natifs, la partie inexpliquée de l'écart observé correspondra à une discrimination salariale pure en faveur d'un groupe et en défaveur d'un autre groupe. L'équation de la décomposition par la méthode Oaxaca est la suivante :
 
 $\bar{Y}_{B}-\bar{Y}_{A} = \underbrace {\left [ \sum_{k=1}^{K} \left( \bar{X}_{Bk}-\bar{X}_{Ak} \right) \hat{\beta}_{Bk} \right ]}_{\Delta_{x}:\mbox{ explained}} + \underbrace {\left [ \left( \hat{\beta}_{B0} - \hat{\beta}_{A0} \right) + \sum_{k=1}^{K} \hat{X}_{Ak} \left( \hat{\beta}_{Bk} - \hat{\beta}_{Ak} \right) \right ]}_{\Delta_{x}:\mbox{ unexplained}}$
 
@@ -316,8 +317,8 @@ La figure ci-dessous compare les proportions de natifs et d'immigrants au chôma
 
 ```{r acomp2, out.width="50%"}
 p4 <- chom %>% ggplot()
-p4 <- p4 + geom_bar(data = chom, aes(IMMIGRANT, prop, fill = "UNEMP"), stat = "identity", width = 0.9) + 
-  geom_bar(data = lchom, aes(IMMIGRANT, prop, fill = "LONG UNEMP"), col = "gray", stat = "identity", width = 0.9) + 
+p4 <- p4 + geom_bar(data = chom, aes(IMMIGRANT, prop, fill = "UNEMP"), stat = "identity", width = 0.5) + 
+  geom_bar(data = lchom, aes(IMMIGRANT, prop, fill = "LONG UNEMP"), col = "gray", stat = "identity", width = 0.5) + 
   scale_fill_manual(name='', breaks=c('UNEMP', 'LONG UNEMP'), values=c('UNEMP'='#E69F00', 'LONG UNEMP'='#D55E00')) +
   #labs(title = "Proportion d'individus au chômage", caption = "©FRPDJ, Source:StatCan-04/2022") + #french version
   labs(title = "Proportion of unemployment by group", caption = "©FRPDJ, Source:StatCan-04/2022") + #english version
@@ -378,20 +379,24 @@ p5 <- p5 + geom_point(aes(x = variable, y = estim_coef), size = 2, col = "darkbl
   geom_errorbar(aes(x = variable, y = estim_coef, ymin = inf, ymax = sup), col = "darkblue", width=.2) + 
   theme_economist_white() + 
   geom_hline(yintercept = 0, col="red") + 
-  scale_x_discrete(name = "") + scale_y_continuous(name="") +
-  theme(axis.text.x = element_text(size = 12, angle=90, hjust=1),
+  scale_x_discrete(name = "") + scale_y_continuous(name="Ln(wage) OLS estimates") +
+  theme(axis.text.x = element_text(size = 12, angle=60, hjust=1, vjust=1),
         axis.text.y = element_text(size = 12)) + 
   labs(#title = "Structure des salaires au Quebec", #french version
        #subtitle = "\n Croissance des salaires vs caractéristiques individuelles \n", #french version
        title = "The wage structure in Quebec",
        subtitle = "\n Impact of individual caracteristics on wage growth \n", 
-       caption = "(*): p-value < 0.001 \n \n ©FRPDJ, Source: StatCan_EPA-04/22")
+       caption = paste0("(*): p-value < 0.001 \n", 
+                        "N=", sumreg1$df[2]+sumreg1$df[3], "; df=", sumreg1$df[2], 
+                        "; R^2=", round(sumreg1$r.squared,2), 
+                        "\n \n ©FRPDJ, Source: StatCan_EPA-04/22"))
 p5
+
 
 p6 <- educ %>% ggplot()
 p6 <- p6 + geom_point(aes(x = variable, y = estim_coef), size = 2, col = "darkblue") + 
   geom_text(aes(x = variable, y = estim_coef, label=sign), nudge_x = .2, nudge_y = 0) + 
-  geom_errorbar(aes(x = variable, y = estim_coef, ymin = inf, ymax = sup), col = "darkblue", width=.2) + 
+  geom_errorbar(aes(x = variable, y = estim_coef, ymin = inf, ymax = sup), col = "darkblue", width=.1) + 
   geom_point(aes(x = variable, y = estim_coef, col = label), alpha = 0) + 
   theme(plot.title = element_text(size = 18, face = "bold"), plot.subtitle = element_text(size = 13),
         axis.text.x = element_text(size = 12), 
@@ -402,12 +407,15 @@ p6 <- p6 + geom_point(aes(x = variable, y = estim_coef), size = 2, col = "darkbl
         panel.background = element_rect(fill = "white")) + 
   geom_hline(yintercept = 0, col="red") + 
   scale_x_discrete(name = "", labels = c("L1", "L2")) + 
-  scale_y_continuous(name="") + scale_color_discrete(name="") + 
+  scale_y_continuous(name="Ln(wage) OLS estimates") + scale_color_discrete(name="") + 
   labs(#title = "Structure des salaires au Quebec : croissance des salaires vs niveau d'éducation", #french version
        #subtitle = "\n Niveau de référence : travailleurs avec éducation secondaire ou inférieure \n", #french version
        title = "Wage structure in Quebec: impact of education on wage growth", 
        subtitle = 'Reference: Workers with Secondary education or below', 
-       caption = "(*): p-value < 0.001 \n \n ©FRPDJ, Source: StatCan_EPA-04/22")
+       caption = paste0("(*): p-value < 0.001 \n", 
+                        "N=", sumreg1$df[2]+sumreg1$df[3], "; df=", sumreg1$df[2], 
+                        "; R^2=", round(sumreg1$r.squared,2), 
+                        "\n \n ©FRPDJ, Source: StatCan_EPA-04/22"))
 p6
 
 p7 <- occup %>% ggplot()
@@ -416,7 +424,7 @@ p7 <- p7 + geom_point(aes(x = variable, y = estim_coef), size = 2, col = "darkbl
   geom_errorbar(aes(x = variable, y = estim_coef, ymin = inf, ymax = sup), col = "darkblue", width=.2) + 
   geom_point(aes(x = variable, y = estim_coef, col = label), alpha = 0) + 
   geom_hline(yintercept = 0, col="red") + scale_x_discrete(name = "", labels = c("S10", "S9","S2","S6","S8","S4","S5","S3","S1")) + 
-  scale_y_continuous(name="") + 
+  scale_y_continuous(name="Ln(wage) OLS estimates") + 
   scale_color_discrete(name="Sectors") + 
   theme(plot.title = element_text(size = 18, face = "bold"), plot.subtitle = element_text(size = 13),
         axis.text.x = element_text(size = 12), axis.text.y = element_text(size = 12), 
@@ -428,7 +436,10 @@ p7 <- p7 + geom_point(aes(x = variable, y = estim_coef), size = 2, col = "darkbl
        #subtitle = "\n Niveau de référence : secteur des ventes et services \n", #french version
        title = "Wage structure in Quebec: comparing employment sectors", 
        subtitle = 'Reference level is the sector of Sales and services', 
-       caption = "(*): p-value < 0.001 \n \n ©FRPDJ, Source: StatCan_EPA-04/22")
+       caption = paste0("(*): p-value < 0.001 \n", 
+                        "N=", sumreg1$df[2]+sumreg1$df[3], "; df=", sumreg1$df[2], 
+                        "; R^2=", round(sumreg1$r.squared,2), 
+                        "\n \n ©FRPDJ, Source: StatCan_EPA-04/22"))
 p7
 ```
 
@@ -436,8 +447,74 @@ p7
 
 Le Tableau 4 présente les résultats de la décomposition de l'écart salarial observé entre le groupe des non immigrants (A) et celui des immigrants (B). La première colonne donne la répartition des deux groupes dans l'échantillon alors que les moyennes de salaire associées à chaque groupe figurent dans la deuxième colonne. Nous observons une différence de salaire horaire de 0,83\$ en faveur des natifs (\$y.diff). Cet écart peut être décomposé suivant les données inscrites dans les deux dernières colonnes : -2,62\$ peuvent être expliqués par le modèle dont 63% (-1,63\$) sont dues à la stricte dotation en caractéristiques différentes entre les groupes et 37% (-0,99\$) aux interactions entre les caractéristiques et leur valorisation sur le marché; 3,44\$ d'écart reste inexpliqué, ce qui peut être considéré comme une discrimination salariale pure. En prenant les natifs comme situation de référence, l'analyse des résultats de la décomposition indique que compte tenu des différences de caractéristiques (immigrants vs les natifs) et des interactions, on devrait en principe observer un salaire moyen de 32,9\$/h. Cela correspondrait à un écart salarial de 2,6\$ en faveur des immigrants. Or l'écart observé est plutôt de 0,8\$ en faveur des natifs. Cela explique la discrimination de 3,4\$ en faveur des natifs.
 
-```{r ecart_decomp1}
+```{r reg_oaxaca}
+baseQC.paid$T.IMMIG <- with(baseQC.paid, IMMIGRANT == 1)    #Variables de type 'logical'
 
+results <- oaxaca(formula = SAL ~ YOUNG + WOMAN + MARRIED + EDUC.LEVEL + SELF.EMP + 
+                    OCCUP.SEC + PART.TIME + YRS.TENURE + SYNDIC + LARGFIRM | T.IMMIG, 
+                  data = baseQC.paid, R = 100)
+```
+
+```{r ecart_decomp1}
+#Decomposition de l'inégalité salariale (méthode Oaxaca)
+
+#résultat de la décomposition
+tab <- data.frame()
+tab <- data.frame(n = c(paste("A",results$n$n.A,sep = "\n"), 
+                        paste("B",results$n$n.B, sep = "\n"), 
+                        paste("pooled",results$n$n.pooled, sep = "\n")), 
+                  y = c(paste("A",round(results$y$y.A, 2), sep = "\n"), 
+                        paste("B",round(results$y$y.B, 2), sep = "\n"),
+                        paste("diff",round(results$y$y.diff, 2), sep = "\n")),
+                  twofold = c(paste("explained", round(results$twofold$overall[2,2], 2), sep = "\n"),
+                              paste("unexplained", round(results$twofold$overall[2,4], 2), sep = "\n"),
+                              paste0("")),
+                  threefold = c(paste("endowments", round(results$threefold$overall[1], 2), sep = "\n"), 
+                                paste("coefficients", round(results$threefold$overall[3], 2), sep = "\n"), 
+                                paste("interaction", round(results$threefold$overall[5], 2), sep = "\n")))
+
+tab %>% flextable() %>% set_caption("Wage decomposition results (Oaxaca method)")
+
+#graphique illutrant la discrimination
+
+discrim <- data.frame(gap_type = c("Observed", "Expected", "Unexplained"), 
+                      value = c(results$y$y.diff, results$twofold$overall[2,2], results$twofold$overall[2,4]))
+
+p8 <- discrim %>% ggplot(aes(gap_type, -value, fill = c("col1", "col2", "col3"))) + 
+    geom_col(width = .95, position = "dodge") + 
+    scale_fill_manual(values = c("col1"="#CC79A7","col2"="#009E73","col3"="#D55E00")) + 
+    scale_x_discrete(name = "Wage Gap") +
+    ylab("") +
+    theme_fivethirtyeight() +
+    theme(axis.text = element_text(size = 11), legend.position = "none", aspect.ratio = .4, 
+          panel.background =element_rect(fill = "white"), plot.background = element_rect(fill = "white")) + 
+    coord_flip() +
+    labs(#title = "Structure des salaires au Quebec", #french version
+         #subtitle = "\n Décomposition de l'écart salarial immigrants vs natifs \n", #english version
+         title = "The wage structure in Quebec", 
+         subtitle = 'Decomposing the wage gap between immigrants and Canadian born citizens', 
+         caption = "Method: Blinder-Oaxaca \n \n ©FRPDJ, Source: StatCan_EPA-04/22")
+p8
+```
+
+
+```{r ecart_decomp2}
+
+#graphe de la formation des ecarts expliqués par le modèle
+plot(results, decomposition = "twofold", group.weight = 1, components = c("explained"), 
+     title = "Contribution des variables à la formation de l'écart expliqué")   
+round(results$twofold$variables[[2]][,2:3],3)   #coefficients de la formation des ecarts expliqués par le modèle
+
+plot(results, components = c("endowments"))   #graphe de la formation des ecarts expliqués par les différences de caractéristiques
+plot(results, components = c("interaction"))   #graphe de la formation des ecarts expliqués par les interactions
+plot(results, components = c("coefficients")) #graphe de la formation des ecarts inexpliqués
+round(results$threefold$variables, 3)  #coefficients de la formation des ecarts expliqués par les différences de caractéristiques
+
+
+# Verification des differences de caracteristiques entre immigrants et non immigrants dans l'échantillon des salariés
+test <- round(as.data.frame(results$x), 3) %>% rename(mean_nat = x.mean.A, mean_im = x.mean.B, diff = x.mean.diff)
+test <- test[-1,]
+test
 ```
 
 Nous analysons de manière détaillée la formation de l'écart expliqué par les différences de caractéristiques (Figure 5). Les données chiffrées sont présentées en annexe au Tableau 12. Le niveau d'éducation élevé (EDUC.LEVEL2) et la présence au secteur des Sciences naturelles et appliquées (OCCUP.SEC3) sont les deux caractéristiques qui jouent le plus en faveur des immigrants et en défaveur des natifs. Ces caractéristiques représentent respectivement 88% et 54% de l'écart expliqué par les différences dans les dotations individuelles. Ces résultats concordent avec l'analyse descriptive de notre échantillon des salariés à l'Annexe A-2 (Tableau 11). On observe en effet que comparativement aux natifs, il y a une plus grande proportion d'immigrants ayant un niveau d'éducation élevé ou supérieur au baccalauréat7 (49,4% vs 24,6%) et concentrés dans les professions des Sciences naturelles et appliquées (14,7% vs 8,8%). Or ces critères sont valorisés positivement sur le marché du travail québécois (voir Tableau 3). Cela explique donc que le fait que les immigrants sont avantagés par ces caractéristiques.

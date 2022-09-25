@@ -39,3 +39,8 @@ dev.off()
 png(file = "plot/occup_wagegrowth.png", width = 1500/2, height = 740/2)
 p7
 dev.off()
+
+#save p8
+png(file = "plot/wage_decomp.png", width = 1280/2, height = 740/2)
+p8
+dev.off()
