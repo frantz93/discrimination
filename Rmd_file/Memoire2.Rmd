@@ -1,0 +1,1137 @@
+---
+title: 'Discrimination dans l’accès à l’emploi et la rémunération : le cas des immigrants
+  au Québec'
+author: "Frantz Roby POINT DU JOUR"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: TRUE
+    number_sections: TRUE
+    fig_caption: true
+#  pdf_document: 
+#    toc: TRUE
+#    number_sections: TRUE
+#    fig_caption: true
+    #latex_engine: xelatex
+header-includes:
+  \usepackage{caption}
+bibliography: references.bib
+link-citations: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo=FALSE, message=FALSE, warning=FALSE)
+options(digits = 8/2, scipen = 00)
+library(tidyverse)
+library(knitr)
+library(flextable)
+library(kableExtra)
+library(FactoMineR)
+library(ggplot2)
+library(ggthemes)
+library(scales)
+library(gridExtra)
+library(oaxaca)
+set_flextable_defaults(fonts_ignore = TRUE)
+```
+
+# RESUMÉ {.unnumbered}
+
+Cette étude fait une comparaison entre les immigrants et les natifs dans la province du Québec au Canada, en ce qui a trait à l'accès à l'emploi et à la rémunération salariale. L'accès à l'emploi est mesuré en termes de probabilité de chômage longue durée (soit un minimum de 12 mois) et la rémunération en termes de salaire horaire perçu par l'individu. Nous utilisons pour cela des méthodes de régression linéaire et logistique ainsi que des méthodes de décomposition des inégalités observées entre les groupes (méthode Oaxaca-Blinder et méthode Fairlie). Les [**résultats**]{style="color:blue"} de notre recherche prouvent l'existence d'une discrimination à l'encontre des immigrants tant au niveau de l'accès à l'emploi que de la rémunération. Au niveau de l'accès à l'emploi, un immigrant chômeur a 2,4 fois plus de chance d'expérimenter un chômage longue durée (au moins 12 mois) par rapport à un natif. Il y a un surplus de probabilité de chômage long de 8,2% chez les immigrants chômeurs qui ne s'explique par une discrimination purement négative contre ces derniers. Au niveau de la rémunération, l'immigrant moyen gagne un salaire horaire environ 10% inférieur à celui d'un natif, toutes choses égales par ailleurs. Il y a un écart inexpliqué de 3,4\$ entre le salaire horaire moyen que les immigrants auraient dû recevoir et ce qu'ils reçoivent dans la réalité. Ces résultats appellent à un renforcement des politiques d'insertion professionnelle et de lutte contre les discriminations à l'endroit des immigrants au Québec.
+
+# INTRODUCTION
+
+La discrimination envers des groupes d'individus sur le marché du travail reste un sujet d'actualité. Alors que tous les gouvernements poursuivent des objectifs de création d'emplois et de croissance économique, il en résulte évidemment un enjeu d'inégalité et de justice sociale. Il arrive en effet que des employeurs accordent des traitements inéquitables aux individus non pas sur la base des critères de productivité (ex. niveau d'éducation, profession, etc.) mais en raison d'autres caractéristiques non productives telles que le sexe, l'origine ou l'apparence physique [@carcillo2018]. Cette situation reconnue comme de la discrimination s'avère être un frein important au développement des pays. Car au-delà de la croissance, il importe de considérer l'aspect qualitatif de l'évolution économique.
+
+Avec les progrès technologiques et la mondialisation des économies, la migration des populations entre les régions et les pays est de plus en plus répandue. Ainsi plusieurs pays dont le Canada mettent en place des politiques migratoires d'envergure. Ces mesures visent à soutenir le taux de croissance de la population tout en favorisant la croissance et le développement économique. Parmi toutes les provinces canadiennes, le Québec est celle qui accorde une importance toute particulière à ses politiques migratoires car elle poursuit l'objectif supplémentaire de la protection de la langue française. La province jouit par conséquent d'une exemption singulière en ayant la possibilité de choisir une grande majorité de ces immigrants suivant les besoins précises de son économie. Les immigrants québécois sont alors finement sélectionnés à partir d'un éventail de programmes minutieusement conçus par le ministère de l'immigration du Québec. Cependant, si les efforts de planification de l'immigration québécoise ont aidé à améliorer la situation des immigrants en termes de taux d'emploi et de chômage par exemple, de nombreuse interrogations se posent encore quant à l'intégration des immigrants sur le marché du travail [@aziaba2020; @guay2021] [^1].
+
+[^1]: Aziaba (2020) rapporte une hausse de 6% du taux d'emploi et une baisse de 10% du taux de chômage chez les immigrants du principal groupe d'âge actif du Québec, entre 2006 et 2017.
+
+Dans ce contexte, nous nous posons la question suivante : quel est le niveau d'intégration des immigrants au Québec en termes d'accès à l'emploi et de rémunération salariale ? Notre objectif est de déterminer s'il existe une discrimination entre les immigrants et les personnes nées au Canada au niveau de la facilité d'accès à l'emploi et du montant de salaire perçu. Plus spécifiquement, nous cherchons à :
+
+1.  Déterminer si une personne immigrante au Québec est rémunérée au même niveau qu'une personne née au Canada.
+2.  Vérifier si les immigrants restent plus longtemps au chômage que les non-immigrants.
+
+Le présent travail est structuré comme suit. Dans un premier temps, nous discutons de la littérature au sujet des facteurs déterminants dans l'accès à l'emploi et la rémunération. Nous nous basons sur ces éléments de discussion pour sélectionner des variables à intégrer dans la construction de nos modèles économétriques. Ces derniers sont présentés dans la deuxième section portant sur la méthodologie de l'étude. Nous y exposons également des méthodes de décomposition utilisées pour expliquer les inégalités mesurées entre les immigrants et les non-immigrants. La troisième section expose les résultats de notre recherche et leur analyse. Elle est suivie d'une conclusion sur les principales retombées de l'étude ainsi que ses limites.\
+
+# REVUE DE LITTÉRATURE
+
+## Discrimination sur le marché du travail
+
+Dans cette section, nous faisons une brève discussion de la littérature concernant la discrimination sur le marché du travail notamment envers les immigrants.
+
+### Les théories à la base de la discrimination
+
+La littérature portant sur les explications théoriques de la discrimination est assez abondante. La discrimination est définie de multiple manière. Nous nous focalisons ici la discrimination économique. En général, on admet deux principaux types de discrimination :
+
+-   Il y a la discrimination dite intentionnelle ou pure qui est dûment identifiée comme une décision de traiter inéquitablement un groupe d'individus par rapport à un autre. Comme le souligne @bon-maury2016, il s'agit ici d'une situation où une personne est traitée de manière moins favorable par rapport à une autre à cause de son appartenance ou de sa non-appartenance, vraie ou supposée, à un groupe comme une ethnie ou une race, un sexe, une religion, ou encore une origine. Cette vision est confortées par les travaux de @becker1971 pour qui la discrimination résulte d'un acte intentionnel de la part de l'employeur. Ce choix de l'employeur peut être dû à sa volonté de garder ses distances avec un groupe d'individus présentant des caractéristiques données, ou encore à ses préférences pour groupes d'individus particulier. Cette volonté de discrimination observée chez l'employeur peut dépendre entièrement de lui-même, du goût partagé par ces employés, ou encore de la pression exercée par les consommateurs.
+-   Par ailleurs, la discrimination peut être l'effet d'un acte non intentionnel. En effet, certaines dispositions ou pratiques apparemment neutre peuvent toujours entraîner un désavantage particulier pour des personnes par rapport à d'autres [@bon-maury2016]. On retrouve ici les idées de @phelps1972 pour lequel les employeurs averses au risque sont conduits à faire des choix qui, en situation d'asymétrie d'information, sont forcément guidés par des croyances et génèrent donc une attitude discriminante.
+
+Finalement, il faut reconnaitre que nous traitons ici d'un phénomène assez complexe à analyser. Car comme l'affirme @gazier2010, la discrimination est un phénomène multi-dimensionne qui met en jeu des interactions entre de nombreux acteurs dans de nombreux domaines et selon de multiples modalités. Dans la littérature, trois approches sont généralement utilisées pour mesurer ce phénomène [@bon-maury2016] : les enquêtes de victimation où l'on mesure de la perception des victimes déclarées; la méthode *testing* qui met en évidence un traitement inégal dans une situation donnée; et la méthode statistique d'étude des écarts entre la situation d'un groupe discriminé et celle d'un groupe de référence. Cette dernière méthode concerne la méthodologie adoptée dans le cadre de cette étude et que nous exposeront à la prochaine section.
+
+### Discrimination envers les immigrants
+
+Plusieurs études soulèvent des cas de discrimination envers les immigrants sur des marché du travail dans certains pays. @aeberhardt2013 montrent par exemple que le marché du travail français est impacté par ce phénomène. Leur étude souligne l'existence d'écart de salaire et de taux d'emploi entre les individus de descendance française et ceux dont les parents sont originaires du Maghreb, d'Afrique sub-saharienne et du Proche-Orient, voire des pays d'Europe du Sud. Aux Etats-Unis, @hersch2008 montre que même au sein du groupe des immigrants, il y a de la discrimination salariale sur la base de la couleur de leur peau, les noirs étant rémunérés à un niveau inférieur par rapport à leurs homologues immigrants blancs.
+
+Le marché du travail au Québec ne semble pas être épargné par les phénomène discriminatoire contre les immigrants, bien que la discrimination soit interdite légalement et condamnée dans cette province du Canada. Dans son étude mobilisant la méthode testing, @eid2012 étudie le comportement des recruteurs à l'égard des candidats à l'emploi à Montréal (Québec). Les résultats révèlent qu'à profil égal, un candidat majoritaire ayant un nom franco-québécois a au moins 60 % plus de chances d'être invité à un entretien qu'un candidat avec un nom arabe, latino-américain ou africain. Par ailleurs, ces derniers courent un plus grand risque d'être ignorés par l'employeur après leur entrevue, et cela sur une base discriminatoire. Dans une autre étude, @chicha2012 souligne qu'une proportion de plus en plus grande d'immigrantes au Québec occupent des emplois peu qualifiés et cela de façon durable. L'auteure mobilise une approche qualitative pour expliquer comment des immigrantes détenant un diplôme universitaire dans leur pays d'origine subissent une déqualification lorsqu'elles s'établissent au Québec.
+
+Les constats précédents justifient la nécessité de réaliser d'autres études en mobilisant d'autres méthodes possibles pour analyser le problème de la discrimination sur le marché québécois. Dans le cadre de notre étude, nous mobilisons la méthode statistique d'étude des écarts pour mesurer la discrimination entre les personnes nées au Québec ou au Canada et les immigrants internationaux d'une manière général.
+
+# MÉTHODOLOGIE
+
+Afin de réaliser ce travail, une méthodologie en trois phases a été appliquée : collecte de données, analyse exploratoire, analyse économétrique. Nous présentons ci-dessous de manière détaillée chacune de ces étapes.
+
+## Collecte des données
+
+Les données ont été collectées sur le site de Statistique Canada, l'institution gouvernementale de référence en matière de production de données statistiques. Statistique Canada réalise mensuellement une Enquête sur la population active (EPA) et publie les données brutes collectées à chaque fin du mois. Cette enquête vise à informer sur la situation du marché de l'emploi à travers tous le Canada. A cet effet, les données publiées concernent toutes les provinces canadiennes. Nous nous intéressons toutefois aux données qui concernent le Québec. Dans le cadre de cette étude, nous avons utilisé les données publiées au mois d'avril 2022. Des informations supplémentaires concernant l'EPA ainsi que les données publiées sont accessibles en ligne[^2]. La base de données utilisée `base.RData` accompagnée du fichier script R `discrim_script.R` sont fournie en annexe afin de favoriser la reproductibilité du travail. Le dictionnaire détaillé des principales variables présentes dans la base se trouve dans le fichier `dico.csv`. Ci-dessous, nous présentons les variables constituées après la phase de traitement des données sur R.
+
+[^2]: Enquêtes et programmes statistiques - Enquête sur la population active (EPA). [Consulter en ligne](https://www23.statcan.gc.ca/imdb/p2SV_f.pl?Function=getSurvey&Id=1389764)
+
+```{r descripbase}
+
+# Lecture et visualisation de la base de donnees
+load("../base.RData")
+
+# Creation et formattage des variables
+attach(base)
+
+base$YOUNG <- factor(if_else(AGE < 3, 1, 0))
+base$WOMAN <- factor(if_else(SEX == 1, 0, 1))
+base$MARRIED <- factor(if_else(MARSTAT == 1, 1, 0))
+base$EDUC.LEVEL <- factor(if_else(EDUC < 3, 0, if_else(EDUC < 5, 1, 2)))
+base$IMMIGRANT <- factor(if_else(IMMIG != 3, 1, 0))
+base$ISPAID <- factor(PAID)
+base$SELF.EMP <- factor(if_else(CATWORK == 1, 0, 1))
+base$PART.TIME <- factor(if_else(WTIME == 2, 1, 0))
+base$SYNDIC <- factor(if_else(UNION != 3, 1, 0))
+base$LARGFIRM <- factor(if_else(FIRMSIZE == 4, 1, 0))
+base$ISUNEMP <- factor(UNEMP)
+base$LONG.UNEMP <- factor(if_else(DURUNEMP >= 52, 1, 0))
+base$OCCUP.SEC <- factor(OCCUP)
+base$OCCUP.SEC <- factor(OCCUP, levels = c(7, 1, 2, 3, 4, 5, 6, 8, 9, 10))
+base$SAL <- HRLYEARN/100
+base$YRS.TENURE <- base$TENURE/12
+
+base$PROVINCE <- factor(PROV, labels = c("Terre-Neuve-et-Labrador", "Île-du-Prince-Édouard", "Nouvelle-Écosse", "Nouveau-Brunswick", 
+                                         "Québec", "Ontario", "Manitoba", "Saskatchewan", "Alberta", "Colombie-Britannique"))
+base$LN.SAL <- log(base$SAL)
+
+descrip <- data.frame(Variable=names(select(base,c(18:32))), 
+                      Description=c("Catégorie d’âge de l’individu : (1) si âgé de moins de 30 ans ; (0) sinon.",
+                                    "Genre femme : (1) s’il s’agit d’une femme ; (0) pour les hommes.",
+                                    "Statut matrimonial : (1) si marié ; (0) sinon.",
+                                    paste0("Niveau d’éducation : (0) faible [études secondaires ou moins] ; (1) moyen [études ",
+                                           "post-secondaires inférieures au baccalauréat] ; (2) élevé [diplôme de baccalauréat ",
+                                           "ou plus]"),
+                                    "Statut d’immigrant : (1) si la personne est immigrante ; (0) si la personne est née au Canada.",
+                                    "Statut de salarié : (1) si la personne perçoit un salaire ; (0) sinon.",
+                                    paste0("Statut de travailleur autonome : (1) si le répondant est travailleur autonome ; ",
+                                           "(0) s’il s’agit d’un employé."),
+                                    "Temps de travail : (1) temps partiel ; (0) temps plein.",
+                                    paste0("(1) Si la personne est membre d’un syndicat ou couverte par une convention collective ",
+                                           "négociée par un syndicat ; (0) sinon."),
+                                    paste0("Taille de l’entreprise employeuse : (1) pour les grandes firmes de plus de 500 employés",
+                                           "; (0) pour les plus petites entreprises."),
+                                    "(1) Si la personne est au chômage ; (0) sinon.",
+                                    "(1) Pour les personnes en recherche d’emploi depuis au moins 12 mois chômage long ; (0) sinon.",
+                                    paste0("Catégories professionnelles selon le système de classification nationale : (1) Gestion ",
+                                           "(2) Affaires, finance et administration (3) Sciences naturelles et appliquées et ",
+                                           "domaines apparentés (4) Secteur de la santé (5) Enseignement, droit et services ",
+                                           "sociaux, communautaires et gouvernementaux (6) Arts, culture, sports et loisirs ",
+                                           "(7) Vente et services (8) Métiers, transport, machinerie et domaines apparentés ",
+                                           "(9) Ressources naturelles, agriculture et production connexe ",
+                                           "(10) Fabrication et services d'utilité publique"),
+                                    "Salaire horaire habituel (en dollar canadien)",
+                                    "Durée de l'emploi avec l'employeur actuel (en années)"))
+
+kable(descrip, caption = "Description des variables", "simple")
+#descrip %>% regulartable() %>% autofit() %>% width(j=~Variable, width = 1) %>% width(j=~Description, width = 5.4) %>% set_caption("Description des variables") #for fitting PDF doc
+```
+
+```{r createdb}
+
+base <- read.csv("../datasets/pub0121.csv")
+b0121 <- data.frame(ID = base$REC_NUM, SURVYEAR = base$SURVYEAR, SURVMNTH = base$SURVMNTH,
+                    PROV = base$PROV, AGE = base$AGE_12, SEX = base$SEX, MARSTAT = base$MARSTAT,
+                    EDUC = base$EDUC, IMMIG = base$IMMIG, PAID = if_else(!is.na(base$HRLYEARN), 1, 0),
+                    CATWORK = if_else(base$COWMAIN == 1 | base$COWMAIN == 2, 1, 2), 
+                    UNEMP = if_else(!is.na(base$DURUNEMP), 1, 0), OCCUP = base$NOC_10,
+                    WTIME = base$FTPTMAIN, TENURE = base$TENURE, UNION = base$UNION, 
+                    FIRMSIZE = base$FIRMSIZE, HRLYEARN = base$HRLYEARN, DURUNEMP = base$DURUNEMP)
+base <- read.csv("../datasets/pub0221.csv")
+b0221 <- data.frame(ID = base$REC_NUM, SURVYEAR = base$SURVYEAR, SURVMNTH = base$SURVMNTH,
+                    PROV = base$PROV, AGE = base$AGE_12, SEX = base$SEX, MARSTAT = base$MARSTAT,
+                    EDUC = base$EDUC, IMMIG = base$IMMIG, PAID = if_else(!is.na(base$HRLYEARN), 1, 0),
+                    CATWORK = if_else(base$COWMAIN == 1 | base$COWMAIN == 2, 1, 2), 
+                    UNEMP = if_else(!is.na(base$DURUNEMP), 1, 0), OCCUP = base$NOC_10,
+                    WTIME = base$FTPTMAIN, TENURE = base$TENURE, UNION = base$UNION, 
+                    FIRMSIZE = base$FIRMSIZE, HRLYEARN = base$HRLYEARN, DURUNEMP = base$DURUNEMP)
+base <- read.csv("../datasets/pub0321.csv")
+b0321 <- data.frame(ID = base$REC_NUM, SURVYEAR = base$SURVYEAR, SURVMNTH = base$SURVMNTH,
+                    PROV = base$PROV, AGE = base$AGE_12, SEX = base$SEX, MARSTAT = base$MARSTAT,
+                    EDUC = base$EDUC, IMMIG = base$IMMIG, PAID = if_else(!is.na(base$HRLYEARN), 1, 0),
+                    CATWORK = if_else(base$COWMAIN == 1 | base$COWMAIN == 2, 1, 2), 
+                    UNEMP = if_else(!is.na(base$DURUNEMP), 1, 0), OCCUP = base$NOC_10,
+                    WTIME = base$FTPTMAIN, TENURE = base$TENURE, UNION = base$UNION, 
+                    FIRMSIZE = base$FIRMSIZE, HRLYEARN = base$HRLYEARN, DURUNEMP = base$DURUNEMP)
+base <- read.csv("../datasets/pub0421.csv")
+b0421 <- data.frame(ID = base$REC_NUM, SURVYEAR = base$SURVYEAR, SURVMNTH = base$SURVMNTH,
+                    PROV = base$PROV, AGE = base$AGE_12, SEX = base$SEX, MARSTAT = base$MARSTAT,
+                    EDUC = base$EDUC, IMMIG = base$IMMIG, PAID = if_else(!is.na(base$HRLYEARN), 1, 0),
+                    CATWORK = if_else(base$COWMAIN == 1 | base$COWMAIN == 2, 1, 2), 
+                    UNEMP = if_else(!is.na(base$DURUNEMP), 1, 0), OCCUP = base$NOC_10,
+                    WTIME = base$FTPTMAIN, TENURE = base$TENURE, UNION = base$UNION, 
+                    FIRMSIZE = base$FIRMSIZE, HRLYEARN = base$HRLYEARN, DURUNEMP = base$DURUNEMP)
+base <- read.csv("../datasets/pub0521.csv")
+b0521 <- data.frame(ID = base$REC_NUM, SURVYEAR = base$SURVYEAR, SURVMNTH = base$SURVMNTH,
+                    PROV = base$PROV, AGE = base$AGE_12, SEX = base$SEX, MARSTAT = base$MARSTAT,
+                    EDUC = base$EDUC, IMMIG = base$IMMIG, PAID = if_else(!is.na(base$HRLYEARN), 1, 0),
+                    CATWORK = if_else(base$COWMAIN == 1 | base$COWMAIN == 2, 1, 2), 
+                    UNEMP = if_else(!is.na(base$DURUNEMP), 1, 0), OCCUP = base$NOC_10,
+                    WTIME = base$FTPTMAIN, TENURE = base$TENURE, UNION = base$UNION, 
+                    FIRMSIZE = base$FIRMSIZE, HRLYEARN = base$HRLYEARN, DURUNEMP = base$DURUNEMP)
+base <- read.csv("../datasets/pub0621.csv")
+b0621 <- data.frame(ID = base$REC_NUM, SURVYEAR = base$SURVYEAR, SURVMNTH = base$SURVMNTH,
+                    PROV = base$PROV, AGE = base$AGE_12, SEX = base$SEX, MARSTAT = base$MARSTAT,
+                    EDUC = base$EDUC, IMMIG = base$IMMIG, PAID = if_else(!is.na(base$HRLYEARN), 1, 0),
+                    CATWORK = if_else(base$COWMAIN == 1 | base$COWMAIN == 2, 1, 2), 
+                    UNEMP = if_else(!is.na(base$DURUNEMP), 1, 0), OCCUP = base$NOC_10,
+                    WTIME = base$FTPTMAIN, TENURE = base$TENURE, UNION = base$UNION, 
+                    FIRMSIZE = base$FIRMSIZE, HRLYEARN = base$HRLYEARN, DURUNEMP = base$DURUNEMP)
+base <- read.csv("../datasets/pub0721.csv")
+b0721 <- data.frame(ID = base$REC_NUM, SURVYEAR = base$SURVYEAR, SURVMNTH = base$SURVMNTH,
+                    PROV = base$PROV, AGE = base$AGE_12, SEX = base$SEX, MARSTAT = base$MARSTAT,
+                    EDUC = base$EDUC, IMMIG = base$IMMIG, PAID = if_else(!is.na(base$HRLYEARN), 1, 0),
+                    CATWORK = if_else(base$COWMAIN == 1 | base$COWMAIN == 2, 1, 2), 
+                    UNEMP = if_else(!is.na(base$DURUNEMP), 1, 0), OCCUP = base$NOC_10,
+                    WTIME = base$FTPTMAIN, TENURE = base$TENURE, UNION = base$UNION, 
+                    FIRMSIZE = base$FIRMSIZE, HRLYEARN = base$HRLYEARN, DURUNEMP = base$DURUNEMP)
+base <- read.csv("../datasets/pub0821.csv")
+b0821 <- data.frame(ID = base$REC_NUM, SURVYEAR = base$SURVYEAR, SURVMNTH = base$SURVMNTH,
+                    PROV = base$PROV, AGE = base$AGE_12, SEX = base$SEX, MARSTAT = base$MARSTAT,
+                    EDUC = base$EDUC, IMMIG = base$IMMIG, PAID = if_else(!is.na(base$HRLYEARN), 1, 0),
+                    CATWORK = if_else(base$COWMAIN == 1 | base$COWMAIN == 2, 1, 2), 
+                    UNEMP = if_else(!is.na(base$DURUNEMP), 1, 0), OCCUP = base$NOC_10,
+                    WTIME = base$FTPTMAIN, TENURE = base$TENURE, UNION = base$UNION, 
+                    FIRMSIZE = base$FIRMSIZE, HRLYEARN = base$HRLYEARN, DURUNEMP = base$DURUNEMP)
+base <- read.csv("../datasets/pub0921.csv")
+b0921 <- data.frame(ID = base$REC_NUM, SURVYEAR = base$SURVYEAR, SURVMNTH = base$SURVMNTH,
+                    PROV = base$PROV, AGE = base$AGE_12, SEX = base$SEX, MARSTAT = base$MARSTAT,
+                    EDUC = base$EDUC, IMMIG = base$IMMIG, PAID = if_else(!is.na(base$HRLYEARN), 1, 0),
+                    CATWORK = if_else(base$COWMAIN == 1 | base$COWMAIN == 2, 1, 2), 
+                    UNEMP = if_else(!is.na(base$DURUNEMP), 1, 0), OCCUP = base$NOC_10,
+                    WTIME = base$FTPTLAST, TENURE = base$TENURE, UNION = base$UNION, 
+                    FIRMSIZE = base$FIRMSIZE, HRLYEARN = base$HRLYEARN, DURUNEMP = base$DURUNEMP)
+base <- read.csv("../datasets/pub1021.csv")
+b1021 <- data.frame(ID = base$REC_NUM, SURVYEAR = base$SURVYEAR, SURVMNTH = base$SURVMNTH,
+                    PROV = base$PROV, AGE = base$AGE_12, SEX = base$SEX, MARSTAT = base$MARSTAT,
+                    EDUC = base$EDUC, IMMIG = base$IMMIG, PAID = if_else(!is.na(base$HRLYEARN), 1, 0),
+                    CATWORK = if_else(base$COWMAIN == 1 | base$COWMAIN == 2, 1, 2), 
+                    UNEMP = if_else(!is.na(base$DURUNEMP), 1, 0), OCCUP = base$NOC_10,
+                    WTIME = base$FTPTMAIN, TENURE = base$TENURE, UNION = base$UNION, 
+                    FIRMSIZE = base$FIRMSIZE, HRLYEARN = base$HRLYEARN, DURUNEMP = base$DURUNEMP)
+base <- read.csv("../datasets/pub1121.csv")
+b1121 <- data.frame(ID = base$REC_NUM, SURVYEAR = base$SURVYEAR, SURVMNTH = base$SURVMNTH,
+                    PROV = base$PROV, AGE = base$AGE_12, SEX = base$SEX, MARSTAT = base$MARSTAT,
+                    EDUC = base$EDUC, IMMIG = base$IMMIG, PAID = if_else(!is.na(base$HRLYEARN), 1, 0),
+                    CATWORK = if_else(base$COWMAIN == 1 | base$COWMAIN == 2, 1, 2), 
+                    UNEMP = if_else(!is.na(base$DURUNEMP), 1, 0), OCCUP = base$NOC_10,
+                    WTIME = base$FTPTMAIN, TENURE = base$TENURE, UNION = base$UNION, 
+                    FIRMSIZE = base$FIRMSIZE, HRLYEARN = base$HRLYEARN, DURUNEMP = base$DURUNEMP)
+base <- read.csv("../datasets/pub1221.csv")
+b1221 <- data.frame(ID = base$REC_NUM, SURVYEAR = base$SURVYEAR, SURVMNTH = base$SURVMNTH,
+                    PROV = base$PROV, AGE = base$AGE_12, SEX = base$SEX, MARSTAT = base$MARSTAT,
+                    EDUC = base$EDUC, IMMIG = base$IMMIG, PAID = if_else(!is.na(base$HRLYEARN), 1, 0),
+                    CATWORK = if_else(base$COWMAIN == 1 | base$COWMAIN == 2, 1, 2), 
+                    UNEMP = if_else(!is.na(base$DURUNEMP), 1, 0), OCCUP = base$NOC_10,
+                    WTIME = base$FTPTMAIN, TENURE = base$TENURE, UNION = base$UNION, 
+                    FIRMSIZE = base$FIRMSIZE, HRLYEARN = base$HRLYEARN, DURUNEMP = base$DURUNEMP)
+
+
+base <- read.csv("../datasets/pub0122.csv")
+b0122 <- data.frame(ID = base$REC_NUM, SURVYEAR = base$SURVYEAR, SURVMNTH = base$SURVMNTH,
+                    PROV = base$PROV, AGE = base$AGE_12, SEX = base$SEX, MARSTAT = base$MARSTAT,
+                    EDUC = base$EDUC, IMMIG = base$IMMIG, PAID = if_else(!is.na(base$HRLYEARN), 1, 0),
+                    CATWORK = if_else(base$COWMAIN == 1 | base$COWMAIN == 2, 1, 2), 
+                    UNEMP = if_else(!is.na(base$DURUNEMP), 1, 0), OCCUP = base$NOC_10,
+                    WTIME = base$FTPTMAIN, TENURE = base$TENURE, UNION = base$UNION, 
+                    FIRMSIZE = base$FIRMSIZE, HRLYEARN = base$HRLYEARN, DURUNEMP = base$DURUNEMP)
+base <- read.csv("../datasets/pub0222.csv")
+b0222 <- data.frame(ID = base$REC_NUM, SURVYEAR = base$SURVYEAR, SURVMNTH = base$SURVMNTH,
+                    PROV = base$PROV, AGE = base$AGE_12, SEX = base$SEX, MARSTAT = base$MARSTAT,
+                    EDUC = base$EDUC, IMMIG = base$IMMIG, PAID = if_else(!is.na(base$HRLYEARN), 1, 0),
+                    CATWORK = if_else(base$COWMAIN == 1 | base$COWMAIN == 2, 1, 2), 
+                    UNEMP = if_else(!is.na(base$DURUNEMP), 1, 0), OCCUP = base$NOC_10,
+                    WTIME = base$FTPTMAIN, TENURE = base$TENURE, UNION = base$UNION, 
+                    FIRMSIZE = base$FIRMSIZE, HRLYEARN = base$HRLYEARN, DURUNEMP = base$DURUNEMP)
+base <- read.csv("../datasets/pub0322.csv")
+b0322 <- data.frame(ID = base$REC_NUM, SURVYEAR = base$SURVYEAR, SURVMNTH = base$SURVMNTH,
+                    PROV = base$PROV, AGE = base$AGE_12, SEX = base$SEX, MARSTAT = base$MARSTAT,
+                    EDUC = base$EDUC, IMMIG = base$IMMIG, PAID = if_else(!is.na(base$HRLYEARN), 1, 0),
+                    CATWORK = if_else(base$COWMAIN == 1 | base$COWMAIN == 2, 1, 2), 
+                    UNEMP = if_else(!is.na(base$DURUNEMP), 1, 0), OCCUP = base$NOC_10,
+                    WTIME = base$FTPTMAIN, TENURE = base$TENURE, UNION = base$UNION, 
+                    FIRMSIZE = base$FIRMSIZE, HRLYEARN = base$HRLYEARN, DURUNEMP = base$DURUNEMP)
+base <- read.csv("../datasets/pub0422.csv")
+b0422 <- data.frame(ID = base$REC_NUM, SURVYEAR = base$SURVYEAR, SURVMNTH = base$SURVMNTH,
+                    PROV = base$PROV, AGE = base$AGE_12, SEX = base$SEX, MARSTAT = base$MARSTAT,
+                    EDUC = base$EDUC, IMMIG = base$IMMIG, PAID = if_else(!is.na(base$HRLYEARN), 1, 0),
+                    CATWORK = if_else(base$COWMAIN == 1 | base$COWMAIN == 2, 1, 2), 
+                    UNEMP = if_else(!is.na(base$DURUNEMP), 1, 0), OCCUP = base$NOC_10,
+                    WTIME = base$FTPTMAIN, TENURE = base$TENURE, UNION = base$UNION, 
+                    FIRMSIZE = base$FIRMSIZE, HRLYEARN = base$HRLYEARN, DURUNEMP = base$DURUNEMP)
+base <- read.csv("../datasets/pub0522.csv")
+b0522 <- data.frame(ID = base$REC_NUM, SURVYEAR = base$SURVYEAR, SURVMNTH = base$SURVMNTH,
+                    PROV = base$PROV, AGE = base$AGE_12, SEX = base$SEX, MARSTAT = base$MARSTAT,
+                    EDUC = base$EDUC, IMMIG = base$IMMIG, PAID = if_else(!is.na(base$HRLYEARN), 1, 0),
+                    CATWORK = if_else(base$COWMAIN == 1 | base$COWMAIN == 2, 1, 2), 
+                    UNEMP = if_else(!is.na(base$DURUNEMP), 1, 0), OCCUP = base$NOC_10,
+                    WTIME = base$FTPTMAIN, TENURE = base$TENURE, UNION = base$UNION, 
+                    FIRMSIZE = base$FIRMSIZE, HRLYEARN = base$HRLYEARN, DURUNEMP = base$DURUNEMP)
+base <- read.csv("../datasets/pub0622.csv")
+b0622 <- data.frame(ID = base$REC_NUM, SURVYEAR = base$SURVYEAR, SURVMNTH = base$SURVMNTH,
+                    PROV = base$PROV, AGE = base$AGE_12, SEX = base$SEX, MARSTAT = base$MARSTAT,
+                    EDUC = base$EDUC, IMMIG = base$IMMIG, PAID = if_else(!is.na(base$HRLYEARN), 1, 0),
+                    CATWORK = if_else(base$COWMAIN == 1 | base$COWMAIN == 2, 1, 2), 
+                    UNEMP = if_else(!is.na(base$DURUNEMP), 1, 0), OCCUP = base$NOC_10,
+                    WTIME = base$FTPTMAIN, TENURE = base$TENURE, UNION = base$UNION, 
+                    FIRMSIZE = base$FIRMSIZE, HRLYEARN = base$HRLYEARN, DURUNEMP = base$DURUNEMP)
+base <- read.csv("../datasets/pub0722.csv")
+b0722 <- data.frame(ID = base$REC_NUM, SURVYEAR = base$SURVYEAR, SURVMNTH = base$SURVMNTH,
+                    PROV = base$PROV, AGE = base$AGE_12, SEX = base$SEX, MARSTAT = base$MARSTAT,
+                    EDUC = base$EDUC, IMMIG = base$IMMIG, PAID = if_else(!is.na(base$HRLYEARN), 1, 0),
+                    CATWORK = if_else(base$COWMAIN == 1 | base$COWMAIN == 2, 1, 2), 
+                    UNEMP = if_else(!is.na(base$DURUNEMP), 1, 0), OCCUP = base$NOC_10,
+                    WTIME = base$FTPTMAIN, TENURE = base$TENURE, UNION = base$UNION, 
+                    FIRMSIZE = base$FIRMSIZE, HRLYEARN = base$HRLYEARN, DURUNEMP = base$DURUNEMP)
+base <- read.csv("../datasets/pub0822.csv")
+b0822 <- data.frame(ID = base$REC_NUM, SURVYEAR = base$SURVYEAR, SURVMNTH = base$SURVMNTH,
+                    PROV = base$PROV, AGE = base$AGE_12, SEX = base$SEX, MARSTAT = base$MARSTAT,
+                    EDUC = base$EDUC, IMMIG = base$IMMIG, PAID = if_else(!is.na(base$HRLYEARN), 1, 0),
+                    CATWORK = if_else(base$COWMAIN == 1 | base$COWMAIN == 2, 1, 2), 
+                    UNEMP = if_else(!is.na(base$DURUNEMP), 1, 0), OCCUP = base$NOC_10,
+                    WTIME = base$FTPTMAIN, TENURE = base$TENURE, UNION = base$UNION, 
+                    FIRMSIZE = base$FIRMSIZE, HRLYEARN = base$HRLYEARN, DURUNEMP = base$DURUNEMP)
+base <- read.csv("../datasets/pub0922.csv")
+b0922 <- data.frame(ID = base$REC_NUM, SURVYEAR = base$SURVYEAR, SURVMNTH = base$SURVMNTH,
+                    PROV = base$PROV, AGE = base$AGE_12, SEX = base$SEX, MARSTAT = base$MARSTAT,
+                    EDUC = base$EDUC, IMMIG = base$IMMIG, PAID = if_else(!is.na(base$HRLYEARN), 1, 0),
+                    CATWORK = if_else(base$COWMAIN == 1 | base$COWMAIN == 2, 1, 2), 
+                    UNEMP = if_else(!is.na(base$DURUNEMP), 1, 0), OCCUP = base$NOC_10,
+                    WTIME = base$FTPTMAIN, TENURE = base$TENURE, UNION = base$UNION, 
+                    FIRMSIZE = base$FIRMSIZE, HRLYEARN = base$HRLYEARN, DURUNEMP = base$DURUNEMP)
+
+
+db <- rbind.data.frame(b0121,b0221,b0321,b0421,b0521,b0621,b0721,b0821,b0921,b1021,b1121,b1221,
+                       b0122,b0222,b0322,b0422,b0522,b0622,b0722,b0822,b0922)
+
+```
+
+
+```{r descripbase2}
+# Creation et formattage des variables
+attach(db)
+
+db$YOUNG <- factor(if_else(AGE < 3, 1, 0))
+db$WOMAN <- factor(if_else(SEX == 1, 0, 1))
+db$MARRIED <- factor(if_else(MARSTAT == 1, 1, 0))
+db$EDUC.LEVEL <- factor(if_else(EDUC < 3, 0, if_else(EDUC < 5, 1, 2)))
+db$IMMIGRANT <- factor(if_else(IMMIG != 3, 1, 0))
+db$ISPAID <- factor(PAID)
+db$SELF.EMP <- factor(if_else(CATWORK == 1, 0, 1))
+db$PART.TIME <- factor(if_else(WTIME == 2, 1, 0))
+db$SYNDIC <- factor(if_else(UNION != 3, 1, 0))
+db$LARGFIRM <- factor(if_else(FIRMSIZE == 4, 1, 0))
+db$ISUNEMP <- factor(UNEMP)
+db$LONG.UNEMP <- factor(if_else(DURUNEMP >= 52, 1, 0))
+db$OCCUP.SEC <- factor(OCCUP)
+db$OCCUP.SEC <- factor(OCCUP, levels = c(7, 1, 2, 3, 4, 5, 6, 8, 9, 10))
+db$SAL <- HRLYEARN/100
+db$YRS.TENURE <- db$TENURE/12
+
+db$PROVINCE <- factor(PROV, labels = c("Terre-Neuve-et-Labrador", "Île-du-Prince-Édouard", "Nouvelle-Écosse", "Nouveau-Brunswick", 
+                                         "Québec", "Ontario", "Manitoba", "Saskatchewan", "Alberta", "Colombie-Britannique"))
+db$LN.SAL <- log(db$SAL)
+
+descrip <- data.frame(Variable=names(select(db,c(18:32))), 
+                      Description=c("Catégorie d’âge de l’individu : (1) si âgé de moins de 30 ans ; (0) sinon.",
+                                    "Genre femme : (1) s’il s’agit d’une femme ; (0) pour les hommes.",
+                                    "Statut matrimonial : (1) si marié ; (0) sinon.",
+                                    paste0("Niveau d’éducation : (0) faible [études secondaires ou moins] ; (1) moyen [études ",
+                                           "post-secondaires inférieures au baccalauréat] ; (2) élevé [diplôme de baccalauréat ",
+                                           "ou plus]"),
+                                    "Statut d’immigrant : (1) si la personne est immigrante ; (0) si la personne est née au Canada.",
+                                    "(1) si la personne perçoit un salaire ; (0) sinon.",
+                                    paste0("Statut de travailleur autonome : (1) si le répondant est travailleur autonome ; ",
+                                           "(0) s’il s’agit d’un employé."),
+                                    "Temps de travail : (1) temps partiel ; (0) temps plein.",
+                                    paste0("(1) Si la personne est membre d’un syndicat ou couverte par une convention collective ",
+                                           "négociée par un syndicat ; (0) sinon."),
+                                    paste0("Taille de l’entreprise employeuse : (1) pour les grandes firmes de plus de 500 employés",
+                                           "; (0) pour les plus petites entreprises."),
+                                    "(1) Si la personne est au chômage ; (0) sinon.",
+                                    "(1) Pour les personnes en recherche d’emploi depuis au moins 12 mois chômage long ; (0) sinon.",
+                                    paste0("Catégories professionnelles selon le système de classification nationale : (1) Gestion ",
+                                           "(2) Affaires, finance et administration (3) Sciences naturelles et appliquées et ",
+                                           "domaines apparentés (4) Secteur de la santé (5) Enseignement, droit et services ",
+                                           "sociaux, communautaires et gouvernementaux (6) Arts, culture, sports et loisirs ",
+                                           "(7) Vente et services (8) Métiers, transport, machinerie et domaines apparentés ",
+                                           "(9) Ressources naturelles, agriculture et production connexe ",
+                                           "(10) Fabrication et services d'utilité publique"),
+                                    "Salaire horaire habituel (en dollar canadien)",
+                                    "Durée de l'emploi avec l'employeur actuel (en années)"))
+
+kable(descrip, caption = "Description des variables", "simple")
+#descrip %>% regulartable() %>% autofit() %>% width(j=~Variable, width = 1) %>% width(j=~Description, width = 5.4) %>% set_caption("Description des variables") #for fitting PDF doc
+```
+
+## Analyse exploratoire
+
+Afin de mieux visualiser les variables dans la base de données nous faisons une analyse exploratoire. Cette analyse est réalisée sur R. Nous vérifions les statistiques descriptives des variables, et aussi les répartitions des proportion d'immigrants et de natifs dans les différentes catégories des variables. Nous réalisons également une Analyse en composantes multiples (ACM) afin de détecter des liens potentiels entre les variables. Sur R, le modèle ACM est obtenu à partir de la commande : `MCA(dataframe, quali.sup, quanti.sup)` de la librairie `FactoMineR`.
+
+## Analyse économétrique
+
+Ce travail est articulé autour de deux principaux modèles économétriques. Un premier modèle de régression linéaire multiple (OLS) sert à vérifier l'existence d'une discrimination dans la rémunération salariale entre les immigrants et les natifs. L'analyse est approfondie par la méthode de décomposition d'Oaxaca-Blinder des inégalités salariaux observés entre les deux groupes. Le deuxième modèle estime la probabilité qu'un individu chômeur tombe en situation de chômage longue durée[^3]. Nous utilisons la méthode de régression logistique pour estimer les probabilités par Maximum de Vraissemblance. Les écarts de probabilités obtenues sont ensuite décomposés par la méthode Fairlie. Touts les calculs économétriques ont été réalisés sur R. Nous décrivons succintement les modèles de régression et les méthodes de décompositions à travers les lignes qui vont suivre.
+
+[^3]: L'individu au chômage est celui dont la durée du chômage est supérieure au égale 12 mois.
+
+### Modélisation de la rémunération salariale
+
+Le modèle de régression du salaire horaire est le suivant :
+
+$Ln(SAL) = \hat{b}_{0} + \hat{b}_{1}YOUNG + \hat{b}_{2}WOMAN + \hat{b}_{3}MARRIED + \hat{b}_{4}EDUC. LEVEL + \hat{b}_{5}IMMIGRANT + \hat{b}_{6}SELF.EMP$ $+ \hat{b}_{7}PART. TIME + \hat {b}_{8}SYNDIC + \hat {b}_{9}LARGFIRM + \hat {b}_{10}OCCUP. SEC + \hat {b}_{11}YRS. TENURE + \epsilon$
+
+La régression par la méthode OLS permet d'estimer les variations en pourcentage dans le salaire horaire suite à une modification dans les variables indépendantes. Sur R, la régression multilinéaire est obtenue à partir de la commande : `lm(formula, data)`.
+
+### Décomposition des inégalités salariaux : méthode Oaxaca
+
+La méthode Oaxaca-Blinder est la méthode la plus classique utilisée en économétrie pour décomposer les inégalités mesurées entre deux groupes pour une variable donnée [@insee2019; @hlavac2022]. Elle est facilement applicable lorsque la variable d'intérêt est continue comme dans le cas du salaire. Cette méthode décompose l'écart observé entre les moyennes mesurées dans chaque groupe en deux parties : une partie expliquée par les différences de caractéristiques entre les groupes et une partie inexpliquée. Dans notre cas actuel où la mesure porte sur l'écart de salaire entre les immigrants et les natifs, la partie inexpliquée de l'écart observé correspondra à une discrimination salariale pure en faveur d'un groupe et en défaveur d'un autre groupe. L'équation de la décomposition par la méthode Oaxaca est la suivante :
+
+$\bar{Y}_{B}-\bar{Y}_{A} = \underbrace {\left [ \sum_{k=1}^{K} \left( \bar{X}_{Bk}-\bar{X}_{Ak} \right) \hat{\beta}_{Bk} \right ]}_{\Delta_{x}:\mbox{ explained}} + \underbrace {\left [ \left( \hat{\beta}_{B0} - \hat{\beta}_{A0} \right) + \sum_{k=1}^{K} \hat{X}_{Ak} \left( \hat{\beta}_{Bk} - \hat{\beta}_{Ak} \right) \right ]}_{\Delta_{x}:\mbox{ unexplained}}$
+
+Où $\bar{Y}_{B}-\bar{Y}_{A}$ est la valeur de l'écart observé entre les moyennes des groupes B et A; les $\left ( \hat{\beta}_{g,k} \right )_{k=1\cdots K, g=A,B}$ sont les coefficients de valorisation des caractéristiques *k* dans chaque groupe *g*; $\left ( \bar{X}_{g,k} \right )_{k=1\cdots K, g=A,B}$ sont les moyennes mesurées des caractéristiques *k* dans chaque groupe *g*.
+
+### Modélisation de la facilité d'accès à l'emploi
+
+Le modèle de régression de la probabilité de chômage long est le suivant :
+
+$Ln\left( \frac{p \left( 1 \mid X \right)}{1 - p \left( 1 \mid X \right)} \right) = \hat{b}_{0} + \hat{b}_{1}YOUNG + \hat{b}_{2}WOMAN + \hat{b}_{3}MARRIED + \hat{b}_{4}EDUC. LEVEL + \hat{b}_{5}IMMIGRANT$
+
+Où $p \left( 1 \mid X \right)$ désigne la probabilité d'être en chômage longue durée.
+
+Cette régression mobilise une loi logistique pour estimer les variations dans la probabilité de tomber en situation de chômage long. Sur R, la régression logistique est réalisée à l'aide de la commande : `glm (formula, data, family = binomial(link="logit"))`.
+
+### Décomposition des probabilités de chômage long : méthode Fairlie
+
+La méthode Fairlie est une alternative à la méthode Oaxaca-Blinder pour décomposer un écart à la moyenne entre deux groupe, lorsque l'approximation linéaire pose problème ou lorsque les différences de caractéristiques observables sont très marquées entre les deux groupes (INSEE, 2019). Elle est adaptée pour la modélisation non linéaire de type probit ou logit. L'équation de la décomposition est la suivante :
+
+$\bar{Y}_{B} - \bar{Y}_{A} = \underbrace {\frac{1}{N_{B}} \sum_{i \in B} Y_{i} - \frac{1}{N_{A}} \sum_{i \in A} \hat{P}_{B}(Y_{i} = 1 \mid X_{i})}_{\mbox{explained}} + \underbrace {\frac{1}{N_{A}} \sum_{i \in A} \hat{P}_{B}(Y_{i} = 1 \mid X_{i}) - \frac{1}{N_{A}} \sum_{i \in A} Y_{i}}_{\mbox{unexplained}}$
+
+Avec $\bar{Y}_{B} - \bar{Y}_{A}$, l'écart observé entre les moyennes des groupes *B* et *A*; $N_{A}$ et $N_{B}$, les effectifs dans les deux groupes; $\hat{P}_{B}(Y_{i} = 1 \mid X_{i})$, les estimations de probabilités contrefactuelles pour chaque individu du groupe *A* (i-e, la probabilité que l'individu du groupe A soit en chômage long si ses caractéristiques sont valorisées comme celles du groupe *B*). Le contrefactuel est fondé sur l'estimation du modèle probit ou logit.
+
+# RÉSULTATS
+
+`r baseQC <- base %>% filter(PROVINCE == "Québec") %>% select(c(18:32,34))`
+
+## Analyse exploratoire
+
+### Description de l'échantillon
+
+Le Tableau ci-dessous présente la répartition de notre échantillon suivant les différentes variables de la base de données. Notre échantillon comprend `r nrow(baseQC)` individus dont 13% d'immigrants. Ce pourcentage est similaire à celui observé dans la population québécoise, soit 13.7% d'immigrants selon le dernier recensement de 2016 [@mifi2021]. Par ailleurs, il y a une majorité de répondants salariés ou travailleurs autonomes. La majorité des travailleurs sont à temps plein et ne sont pas protégés par un syndicat. Les jeunes (-30ans) et les mariés sont minoritaires, alors que les répondants sont équitablement répartis entre les femmes et les hommes. Plus de 60% des répondants ont un niveau d'éducation moyen ou élevé contre 33% de personnes à faible niveau d'éducation. La plupart des travailleurs sont répartis dans les ventes et services comparativement aux autres catégories professionnelles. En moyenne, les salariés gagnaient `r mean(baseQC$SAL, na.rm=TRUE)` \$5/h et occupaient leur emploi actuel depuis 7.85 années. Toutefois, ces valeurs moyennes ne représentent pas bien leur distribution qui sont très dispersées.
+
+```{r statdesc}
+db0422 <- db %>% filter(SURVYEAR==2022 & SURVMNTH==4)  #extract db for April 2022
+baseQC <- db0422 %>% filter(PROVINCE == "Québec") %>% select(c(20:34,36))  #extract db for Quebec
+
+attach(baseQC)
+stat1 <- data.frame(variable = c("YOUNG","WOMAN","MARRIED","EDUC.LEVEL_0","EDUC.LEVEL_1","EDUC.LEVEL_2","IMMIGRANT","ISPAID","SELF.EMP","PART.TIME","SYNDIC","LARGFIRM","ISUNEMP","LONG.UNEMP"), n = c(sum(YOUNG=='1', na.rm=TRUE),sum(WOMAN=='1', na.rm=TRUE),sum(MARRIED=='1', na.rm=TRUE),sum(EDUC.LEVEL=='0', na.rm=TRUE),sum(EDUC.LEVEL=='1', na.rm=TRUE),sum(EDUC.LEVEL=='2', na.rm=TRUE),sum(IMMIGRANT=='1', na.rm=TRUE),sum(ISPAID=='1', na.rm=TRUE),sum(SELF.EMP=='1', na.rm=TRUE),sum(PART.TIME=='1', na.rm=TRUE),sum(SYNDIC=='1', na.rm=TRUE),sum(LARGFIRM=='1', na.rm=TRUE),sum(ISUNEMP=='1', na.rm=TRUE),sum(LONG.UNEMP=='1', na.rm=TRUE)), prop_n = c(mean(YOUNG=='1', na.rm=TRUE),mean(WOMAN=='1', na.rm=TRUE),mean(MARRIED=='1', na.rm=TRUE),mean(EDUC.LEVEL=='0', na.rm=TRUE),mean(EDUC.LEVEL=='1', na.rm=TRUE),mean(EDUC.LEVEL=='2', na.rm=TRUE),mean(IMMIGRANT=='1', na.rm=TRUE),mean(ISPAID=='1', na.rm=TRUE),mean(SELF.EMP=='1', na.rm=TRUE),mean(PART.TIME=='1', na.rm=TRUE),mean(SYNDIC=='1', na.rm=TRUE),mean(LARGFIRM=='1', na.rm=TRUE),mean(ISUNEMP=='1', na.rm=TRUE),mean(LONG.UNEMP=='1', na.rm=TRUE)))
+
+stat2 <- data.frame(variable = c("OCCUP.SEC1","OCCUP.SEC2","OCCUP.SEC3","OCCUP.SEC4","OCCUP.SEC5","OCCUP.SEC6","OCCUP.SEC7","OCCUP.SEC8","OCCUP.SEC9","OCCUP.SEC10"),
+                    n = c(sum(OCCUP.SEC=='1', na.rm=TRUE),sum(OCCUP.SEC=='2', na.rm=TRUE),sum(OCCUP.SEC=='3', na.rm=TRUE),sum(OCCUP.SEC=='4', na.rm=TRUE),sum(OCCUP.SEC=='5', na.rm=TRUE),sum(OCCUP.SEC=='6', na.rm=TRUE),sum(OCCUP.SEC=='7', na.rm=TRUE),sum(OCCUP.SEC=='8', na.rm=TRUE),sum(OCCUP.SEC=='9', na.rm=TRUE),sum(OCCUP.SEC=='10', na.rm=TRUE)),
+                    prop_n = c(mean(OCCUP.SEC=='1', na.rm=TRUE),mean(OCCUP.SEC=='2', na.rm=TRUE),mean(OCCUP.SEC=='3', na.rm=TRUE),mean(OCCUP.SEC=='4', na.rm=TRUE),mean(OCCUP.SEC=='5', na.rm=TRUE),mean(OCCUP.SEC=='6', na.rm=TRUE),mean(OCCUP.SEC=='7', na.rm=TRUE),mean(OCCUP.SEC=='8', na.rm=TRUE),mean(OCCUP.SEC=='9', na.rm=TRUE),mean(OCCUP.SEC=='10', na.rm=TRUE)))
+
+stat3 <- data.frame(variable = c("SAL","YRS.TENURE"), moy = c(mean(SAL, na.rm=TRUE), mean(YRS.TENURE, na.rm=TRUE)), ecart_type = c(sd(SAL, na.rm=TRUE), sd(YRS.TENURE, na.rm=TRUE)))
+
+kables(list(kable(stat1) %>% kable_styling(), list(kable(stat2) %>% kable_styling(), kable(stat3) %>% kable_styling())), caption = "Statistique descriptive") %>% kable_styling()
+
+#kable(list(stat1, stat2, stat3), caption = 'Statistique descriptive', booktabs = TRUE, valign = 't')   #for fitting PDF doc
+```
+
+### Analyse en composantes multiples
+
+Nous testons l'existence d'interrelation entre les variables de notre base de données par une analyse factorielle en composante multiples (ACM). Nous utilisons pour cela la librairie FactoMineR sur R. Les variables d'identité individuelle (genre, âge, statut matrimonial, éducation et statut d'immigrant) sont retenues comme variables fondamentales constituant les dimensions du repère alors que les autres variables catégorielles sont identifiées comme variables qualitatives supplémentaires. Nous représentons aux Figure 1 et Figure 2 ci-dessous les coordonnées respectives des variables supplémentaires et des variables fondamentales les mieux projetées sur les deux premières dimensions du repère.
+
+```{r acm1}
+varACM <- subset.data.frame(baseQC, 
+                            select = c("WOMAN", "YOUNG", "MARRIED", "EDUC.LEVEL", "IMMIGRANT", "SELF.EMP", "SYNDIC", "OCCUP.SEC",
+                                       "PART.TIME", "LARGFIRM", "ISPAID", "ISUNEMP", "LONG.UNEMP", "YRS.TENURE", "SAL"))
+res.mca <- MCA(varACM, quali.sup = c(6:13), quanti.sup = c(14, 15), graph = FALSE)
+
+p0 <- plot(res.mca, invisible = c("ind", "var"), habillage = "quali", cex = 0.9, selectMod = "cos2 20")
+#p0 + labs(title = "Position des variables quali. supp. dans le plan ACM", caption = "©FRPDJ, Source:StatCan-04/2022") + 
+#  theme(plot.title = element_text(size = 18)) #french version
+p0 <- p0 + labs(title = "Showing the supp. quali. variables in the  MCA plan", caption = "©FRPDJ, Source:StatCan-04/2022") + 
+  theme(plot.title = element_text(size = 12)) #english version
+p0
+```
+
+Nous pouvons établir l'existence d'une relation potentielle entre les variables qui se rapprochent dans une même partie du cadrant. Nous voyons ainsi à la Figure 2 que les travailleurs à temps partiels se retrouvent le plus souvent dans les professions des ventes et services, alors que ceux à temps plein sont souvent dans le secteur « Affaires, finance et administration » et sont couverts par un syndicat. Généralement, ces travailleurs à temps plein sont aussi des adultes âgés de 30 ans ou plus (voir la Figure 9 en annexe). Par ailleurs, les travailleurs dans le secteur de la santé ont le plus souvent le statut d'employé. La Figure 1 montre des relations moins fortes entre les variables fondamentales. Nous pouvons en déduire que les natifs sont le plus souvent des hommes avec un peu plus souvent un niveau d'éducation moyen, alors que les immigrants ont un peu plus souvent un niveau élevé d'éducation. La superposition des deux figures montre également que les natifs se retrouvent le souvent à travailler dans les professions des « Métiers, transport, machinerie et domaines apparentés » (voir la Figure 9 en annexe).
+
+```{r acm2}
+p1 <- plot(res.mca, invisible = c("ind", "quali.sup"), habillage = "quali", cex = 0.9, selectMod = "cos2 20")
+#p1 + labs(title = "Position des variables fondamentales dans le plan ACM", caption = "©FRPDJ, Source:StatCan-04/2022") #french version
+p1 <- p1 + labs(title = "Showing the main variables in the MCA plan", caption = "©FRPDJ, Source:StatCan-04/2022") + theme(plot.title = element_text(size = 12))
+#english version
+p1
+```
+
+Il est également possible de représenter les variables quantitatives dans le plan d'analyse en composante multiple. Les variables du salaire et de l'expérience au travail sont représentées à la Figure 8 en annexe. Ces variables se projettent dans un même sens et dans un même cadrant. Il y a donc une corrélation entre le nombre d'année d'expérience6 au travail et le salaire.
+
+### Analyse comparative : immigrants vs natifs
+
+```{r setdata1}
+mean_nat <- round(mean(baseQC$SAL[IMMIGRANT==0], na.rm = TRUE), 1)
+mean_im <- round(mean(baseQC$SAL[IMMIGRANT==1], na.rm = TRUE), 1)
+med_nat <- round(median(baseQC$SAL[IMMIGRANT==0], na.rm = TRUE), 1)
+med_im <- round(median(baseQC$SAL[IMMIGRANT==1], na.rm = TRUE), 1)
+tmoy <- t.test(baseQC$SAL ~ baseQC$IMMIGRANT)
+```
+
+L'analyse comparative entre immigrants et natifs peut être initiée par un examen des distributions de nos variables d'intérêt dans chaque sous-échantillon. En examinant les figures ci-dessous, nous voyons que les immigrants sont relativement plus concentrés dans la catégorie des bas salaires (\<30 \$/h) notamment dans la tranche des salaires allant de 14 à 29 \$h. Parallèlement, les natifs sont en proportion relativement plus élevée dans la catégorie des hauts salaires (\>30 \$/h) et en particulier dans la tranche des 30 à 52 \$/h. Nous voyons également que les distributions sont centrées à gauche, ce qui veut dire que la majorité des individus gagnent un salaire inférieur à la moyenne de leur groupe. Le salaire moyen dans la catégorie des immigrants est légèrement inférieur celui des natifs (`r mean_im` vs `r mean_nat`). L'écart observé est statistiquement significatif ($\alpha < 0.05$), mais il peut être dû d'autres facteurs non contrôlés. A ce stade, nous ne pouvons pas affirmer qu'un immigrant gagne moins qu'un natif.
+
+```{r acomp1, fig.show="hold", out.width="50%"}
+p2 <- baseQC %>% filter(!is.na(SAL) & !is.na(IMMIGRANT)) %>% group_by(IMMIGRANT) %>% ggplot(aes(IMMIGRANT,SAL, fill = IMMIGRANT))
+p2 <- p2 + geom_boxplot() + 
+  #labs(title = "Distribution des salaires (boîtes à moustaches)", caption = "©FRPDJ, Source:StatCan") + #french version
+  labs(title = "Hourly wage distribution in Quebec (boxplot)", caption = "©FRPDJ, Source:StatCan") + #english version
+  theme_fivethirtyeight() + 
+  theme(legend.position="none", axis.text = element_text(size = 12)) + 
+  scale_x_discrete(name="", labels=c("Canadian born", "Immigrant")) + 
+  geom_hline(yintercept = mean_nat, col = "red") +
+  geom_text(aes(x=0.51, y=mean_nat+2, label="mean CB", col="c")) + 
+  geom_hline(yintercept = mean_im, col = "blue") + 
+  geom_text(aes(x=2.5, y=mean_im-2, label="mean IM", col="i"))
+p2
+
+p3 <- baseQC %>% filter(!is.na(SAL) & !is.na(IMMIGRANT)) %>% group_by(IMMIGRANT) %>% ggplot(aes(SAL, fill = IMMIGRANT))
+p3 <- p3 + geom_density(alpha=0.2, bw=2, position = "nudge") + 
+  scale_fill_discrete(name = "", labels = c("Canadian born", "Immigrant")) + 
+  #labs(title = "Distribution des salaires (courbes de densité)", caption = "©FRPDJ, Source:StatCan-04/2022") + #french version 
+  labs(title = "Hourly wage density curve in Quebec", caption = "©FRPDJ, Source:StatCan-04/2022") + #english version
+  theme_fivethirtyeight() + 
+  theme(axis.text = element_text(size = 12), legend.text =  element_text(size = 12)) + 
+  scale_x_continuous(breaks = c(0,9,14,30,52,65,92))
+p3
+
+#Comparing the cumulative distribution function (CDF) by group
+#p32 <- baseQC %>% group_by(IMMIGRANT) %>% ggplot(aes(SAL, col = IMMIGRANT))
+#p32 + stat_ecdf(na.rm = TRUE)
+#p32 + stat_ecdf(na.rm = TRUE) + scale_x_reverse()
+
+```
+
+```{r testmoy}
+print(paste("ttest : p-value = ", round(tmoy$p.value, 4)))
+```
+
+```{r setdata2}
+chom <- baseQC %>% group_by(IMMIGRANT, ISUNEMP) %>% summarise(n = n()) %>% group_by(IMMIGRANT) %>% summarise(ISUNEMP = ISUNEMP, n = n, prop = n/sum(n)) %>% filter(ISUNEMP==1)
+
+rc_nat <- chom %>% filter(IMMIGRANT==0) %>% .$prop %>% percent()
+rc_im <- chom %>% filter(IMMIGRANT==1) %>% .$prop %>% percent()
+
+lchom <- baseQC %>% group_by(IMMIGRANT, LONG.UNEMP) %>% summarise(n = n()) %>% group_by(IMMIGRANT) %>% summarise(LONG.UNEMP = LONG.UNEMP, n = n, prop = n/sum(n)) %>% filter(LONG.UNEMP==1)
+
+rlc_nat <- lchom %>% filter(IMMIGRANT==0) %>% .$prop %>% percent(0.1)
+rlc_im <- lchom %>% filter(IMMIGRANT==1) %>% .$prop %>% percent(0.1)
+
+x2_chom <- chisq.test(baseQC$IMMIGRANT, baseQC$ISUNEMP)
+x2_lchom <- chisq.test(baseQC$IMMIGRANT, baseQC$LONG.UNEMP)
+x2_chom_p <- round(x2_chom$p.value, 5)
+x2_lchom_p <- round(x2_lchom$p.value, 4)
+```
+
+La figure ci-dessous compare les proportions de natifs et d'immigrants au chômage. Plus d'immigrants se retrouvent au chômage par rapport au natifs (`r rc_im` vs `r rc_nat`). En outre, les imigrants au chômage longue durée sont en proportion relativement plus élevée comparés au natifs (`r rlc_im` vs `r rlc_nat`). Les résultats des tests de $\chi^2$ signalent que les proportions observées sont bien différentes entre les groupes. Toutefois, cela ne nous permet pas d'affirmer qu'un immigrant peut plus facilement se retrouver au chômage ou au chômage longue durée sans contrôler l'effet des autres variables qui peuvent influencer la propabilité qu'un individu se trouve dans de telles situations.
+
+```{r acomp2, out.width="50%"}
+p4 <- chom %>% ggplot()
+p4 <- p4 + geom_bar(data = chom, aes(IMMIGRANT, prop, fill = "UNEMP"), stat = "identity", width = 0.5) + 
+  geom_bar(data = lchom, aes(IMMIGRANT, prop, fill = "LONG UNEMP"), col = "gray", stat = "identity", width = 0.5) + 
+  scale_fill_manual(name='', breaks=c('UNEMP', 'LONG UNEMP'), values=c('UNEMP'='#E69F00', 'LONG UNEMP'='#D55E00')) +
+  #labs(title = "Proportion d'individus au chômage", caption = "©FRPDJ, Source:StatCan-04/2022") + #french version
+  labs(title = "Proportion of unemployment by group", caption = "©FRPDJ, Source:StatCan-04/2022") + #english version
+  theme_fivethirtyeight() +
+  theme(axis.text = element_text(size = 12), legend.text =  element_text(size = 12)) + 
+  scale_x_discrete(name="", labels=c("Canadian born", "Immigrant"))
+p4
+```
+
+```{r chi2test, out.width="50%"}
+print(paste("UNEMP: chi2 test p-value = ", x2_chom_p))
+print(paste("LONG UNEMP: chi2 test p-value = ", x2_lchom_p))
+```
+
+## Mesure de la discrimination salariale
+
+Nous allons ici mesurer l'influence du statut d'immigrant sur la rémunération salariale des individus en tenant compte de l'effet possible d'autres facteurs. Dans un premier temps, nous estimons un modèle de régression multiple avec comme variable dépendante le logarithme des salaires. Nous appliquons ensuite la méthode Oaxaca pour décomposer les écarts de salaires mesurés entre les groupes des immigrants et des natifs.
+
+### Estimations par régression linéaire
+
+Le [Tableau 3]{style="color:red"} présente les coefficients estimés de la régression. L'effet de chaque variable sur le salaire est calculé en pourcentage dans la colonne « Effects ». Avec un R2 ajusté de plus de 50%, le pouvoir explicatif de ce modèle est assez intéressant. Tous les coefficients des variables indépendantes sont significatifs au seuil $\alpha = 0.1$. Les résultats des estimations montrent qu'un immigrant québécois gagne environ 10% de moins qu'un natif toute chose étant égale par ailleurs. Ce pourcentage équivaut à un écart d'environ 3,2 \$ en faveur des natifs (voir le Tableau 10 en annexe). Il y a donc de la discrimination salariale en faveur des natifs. Le modèle indique par ailleurs que l'âge jeune (-30 ans), le genre (femme), le statut de travailleur autonome et le travail à temps partiel ont un effet négatif sur le niveau de salaire perçu par les individus, alors que toutes les autres variables ont une influence positive sur le salaire.
+
+Considérant l'influence des autres variables sur le salaire et tenant compte des inégalités de répartition des échantillons d'immigrants et de natifs dans chacune de ces variables, nous supposons que la discrimination salariale (immigrants vs natifs) est due en partie aux différences de caractéristiques entre les deux groupes. C'est cet aspect que nous allons approfondir à la section 3.1.2.
+
+```{r reg1, fig.show="hold", out.width="33%"}
+baseQC.paid <- baseQC %>% filter(ISPAID == 1)  #Filtrage des donnees des salariés au Quebec
+
+reg1 <- lm(LN.SAL ~ YOUNG + WOMAN + MARRIED + EDUC.LEVEL + IMMIGRANT + 
+             OCCUP.SEC + PART.TIME + YRS.TENURE + SYNDIC + LARGFIRM, data = baseQC.paid)
+sumreg1 <- summary(reg1)
+conf1 <- data.frame(confint(reg1, level=0.95)) %>% rename(b_inf=X2.5.., b_sup= X97.5..)
+
+tot <- data.frame(variable = c("intercept", "YOUNG", "WOMAN", "MARRIED", "EDUC.LEVEL_1","EDUC.LEVEL_2", "IMMIGRANT", 
+                               "OCCUP.SEC_1", "OCCUP.SEC_2", "OCCUP.SEC_3", "OCCUP.SEC_4", "OCCUP.SEC_5", "OCCUP.SEC_6", "OCCUP.SEC_8", 
+                               "OCCUP.SEC_9", "OCCUP.SEC_10", "PART.TIME", "YRS.TENURE", "SYNDIC", "LARGFIRM"), 
+                  estim_coef = sumreg1$coefficients[ , 1], inf = conf1$b_inf, 
+                  sup = conf1$b_sup, p_value = sumreg1$coefficients[ , 4]) %>% 
+  mutate(sign = if_else(p_value < 10^-3,"*",if_else(p_value < .05,".",""))) %>% 
+  filter(variable != "intercept")
+
+educ <- tot[4:5,] %>% mutate(label = c("L1: Postsecondary studies below bachelor degree", "L2: Bachelor degree or higher")) %>%
+  mutate(variable = reorder(variable, estim_coef, FUN = median))
+  
+occup <- tot[7:15,] %>% mutate(label = c("S1: Management", "S2: Business, finance and administration",
+                                         "S3: Natural and applied sciences", "S4: Health",
+                                         "S5: Education, law and social, community and government services",
+                                         "S6: Art, culture, recreation and sport",
+                                         "S8: Trades, transport and equipment operators",
+                                         "S9: Natural resources, agriculture",
+                                         "S10: Manufacturing and utilities")) %>% 
+  mutate(variable = reorder(variable, estim_coef, FUN = median))
+
+other <- tot[c(1:3,6,16:19),] %>% mutate(variable = reorder(variable, estim_coef, FUN = median))
+
+p5 <- other %>% ggplot()
+p5 <- p5 + geom_point(aes(x = variable, y = estim_coef), size = 2, col = "darkblue") + 
+  geom_text(aes(x = variable, y = estim_coef, label=sign), nudge_x = .2, nudge_y = 0) + 
+  geom_errorbar(aes(x = variable, y = estim_coef, ymin = inf, ymax = sup), col = "darkblue", width=.2) + 
+  theme_economist_white() + 
+  geom_hline(yintercept = 0, col="red") + 
+  scale_x_discrete(name = "") + scale_y_continuous(name="Ln(wage) OLS estimates") +
+  theme(axis.text.x = element_text(size = 12, angle=60, hjust=1, vjust=1),
+        axis.text.y = element_text(size = 12)) + 
+  labs(#title = "Structure des salaires au Quebec", #french version
+       #subtitle = "\n Croissance des salaires vs caractéristiques individuelles \n", #french version
+       title = "The wage structure in Quebec",
+       subtitle = "\n Impact of individual caracteristics on wage growth \n", 
+       caption = paste0("(*): p-value < 0.001 \n", 
+                        "N=", sumreg1$df[2]+sumreg1$df[3], "; df=", sumreg1$df[2], 
+                        "; R^2=", round(sumreg1$r.squared,2), 
+                        "\n \n ©FRPDJ, Source: StatCan_EPA-04/22"))
+p5
+
+
+p6 <- educ %>% ggplot()
+p6 <- p6 + geom_point(aes(x = variable, y = estim_coef), size = 2, col = "darkblue") + 
+  geom_text(aes(x = variable, y = estim_coef, label=sign), nudge_x = .2, nudge_y = 0) + 
+  geom_errorbar(aes(x = variable, y = estim_coef, ymin = inf, ymax = sup), col = "darkblue", width=.1) + 
+  geom_point(aes(x = variable, y = estim_coef, col = label), alpha = 0) + 
+  theme(plot.title = element_text(size = 18, face = "bold"), plot.subtitle = element_text(size = 13),
+        axis.text.x = element_text(size = 12), 
+        axis.text.y = element_text(size = 12), 
+        legend.text = element_text(size = 11), legend.position = "bottom", 
+        panel.grid.major.y = element_line(color = "darkgrey", linetype = "solid"), 
+        panel.grid.minor.y = element_line(colour = "grey50", linetype = "dashed"), 
+        panel.background = element_rect(fill = "white")) + 
+  geom_hline(yintercept = 0, col="red") + 
+  scale_x_discrete(name = "", labels = c("L1", "L2")) + 
+  scale_y_continuous(name="Ln(wage) OLS estimates") + scale_color_discrete(name="") + 
+  labs(#title = "Structure des salaires au Quebec : croissance des salaires vs niveau d'éducation", #french version
+       #subtitle = "\n Niveau de référence : travailleurs avec éducation secondaire ou inférieure \n", #french version
+       title = "Wage structure in Quebec: impact of education on wage growth", 
+       subtitle = 'Reference: Workers with Secondary education or below', 
+       caption = paste0("(*): p-value < 0.001 \n", 
+                        "N=", sumreg1$df[2]+sumreg1$df[3], "; df=", sumreg1$df[2], 
+                        "; R^2=", round(sumreg1$r.squared,2), 
+                        "\n \n ©FRPDJ, Source: StatCan_EPA-04/22"))
+p6
+
+p7 <- occup %>% ggplot()
+p7 <- p7 + geom_point(aes(x = variable, y = estim_coef), size = 2, col = "darkblue") + 
+  geom_text(aes(x = variable, y = estim_coef, label=sign), nudge_x = .2, nudge_y = 0) + 
+  geom_errorbar(aes(x = variable, y = estim_coef, ymin = inf, ymax = sup), col = "darkblue", width=.2) + 
+  geom_point(aes(x = variable, y = estim_coef, col = label), alpha = 0) + 
+  geom_hline(yintercept = 0, col="red") + scale_x_discrete(name = "", labels = c("S10", "S9","S2","S6","S8","S4","S5","S3","S1")) + 
+  scale_y_continuous(name="Ln(wage) OLS estimates") + 
+  scale_color_discrete(name="Sectors") + 
+  theme(plot.title = element_text(size = 18, face = "bold"), plot.subtitle = element_text(size = 13),
+        axis.text.x = element_text(size = 12), axis.text.y = element_text(size = 12), 
+        legend.text = element_text(size = 11), legend.position = "right", 
+        panel.grid.major.y = element_line(color = "darkgrey", linetype = "solid"), 
+        panel.grid.minor.y = element_line(colour = "grey50", linetype = "dashed"), 
+        panel.background = element_rect(fill = "white")) + 
+  labs(#title = "Structure des salaires au Quebec : comparaison des secteurs d'activités", #french version
+       #subtitle = "\n Niveau de référence : secteur des ventes et services \n", #french version
+       title = "Wage structure in Quebec: comparing employment sectors", 
+       subtitle = 'Reference level is the sector of Sales and services', 
+       caption = paste0("(*): p-value < 0.001 \n", 
+                        "N=", sumreg1$df[2]+sumreg1$df[3], "; df=", sumreg1$df[2], 
+                        "; R^2=", round(sumreg1$r.squared,2), 
+                        "\n \n ©FRPDJ, Source: StatCan_EPA-04/22"))
+p7
+```
+
+### Décomposition de l'écart de salaire (immigrants vs natifs)
+
+```{r reg_oaxaca}
+baseQC.paid$T.IMMIG <- with(baseQC.paid, IMMIGRANT == 1)    #Variables de type 'logical'
+
+results <- oaxaca(formula = SAL ~ YOUNG + WOMAN + MARRIED + EDUC.LEVEL + 
+                    OCCUP.SEC + PART.TIME + YRS.TENURE + SYNDIC + LARGFIRM | T.IMMIG, 
+                  data = baseQC.paid, R = 100)
+```
+
+Le résultat de la décomposition de l'écart salarial entre les natifs (A) et les immigrants (B) est résumé dans la figure ... et détaillé au tableau ... . On constate que une grande différence entre l'écart attendu ou expliqué et l'écart observé entre les deux groupes, ce qui contribue à la formation de l'écart inexpliqué par le modèle. La première colonne donne la répartition des deux groupes dans l'échantillon alors que les moyennes de salaire associées à chaque groupe figurent dans la deuxième colonne. Nous observons une différence de salaire horaire de 0,83\$ en faveur des natifs (\$y.diff). Cet écart peut être décomposé suivant les données inscrites dans les deux dernières colonnes : -2,62\$ peuvent être expliqués par le modèle dont 63% (-1,63\$) sont dues à la stricte dotation en caractéristiques différentes entre les groupes et 37% (-0,99\$) aux interactions entre les caractéristiques et leur valorisation sur le marché; 3,44\$ d'écart reste inexpliqué, ce qui peut être considéré comme une discrimination salariale pure. En prenant les natifs comme situation de référence, l'analyse des résultats de la décomposition indique que compte tenu des différences de caractéristiques (immigrants vs les natifs) et des interactions, on devrait en principe observer un salaire moyen de 32,9\$/h. Cela correspondrait à un écart salarial de 2,6\$ en faveur des immigrants. Or l'écart observé est plutôt de 0,8\$ en faveur des natifs. Cela explique la discrimination de 3,4\$ en faveur des natifs.
+
+```{r ecart_decomp1}
+#Decomposition de l'inégalité salariale (méthode Oaxaca)
+
+#résultat de la décomposition
+tab <- data.frame()
+tab <- data.frame(n = c(paste("A",results$n$n.A,sep = "\n"), 
+                        paste("B",results$n$n.B, sep = "\n"), 
+                        paste("pooled",results$n$n.pooled, sep = "\n")), 
+                  y = c(paste("A",round(results$y$y.A, 2), sep = "\n"), 
+                        paste("B",round(results$y$y.B, 2), sep = "\n"),
+                        paste("diff",round(results$y$y.diff, 2), sep = "\n")),
+                  twofold = c(paste("explained", round(results$twofold$overall[2,2], 2), sep = "\n"),
+                              paste("unexplained", round(results$twofold$overall[2,4], 2), sep = "\n"),
+                              paste0("")),
+                  threefold = c(paste("endowments", round(results$threefold$overall[1], 2), sep = "\n"), 
+                                paste("coefficients", round(results$threefold$overall[3], 2), sep = "\n"), 
+                                paste("interaction", round(results$threefold$overall[5], 2), sep = "\n")))
+
+#graphique illutrant la discrimination
+
+discrim <- data.frame(gap_type = c("Observed", "Expected", "Unexplained"), 
+                      value = c(results$y$y.diff, results$twofold$overall[2,2], results$twofold$overall[2,4]))
+
+p8 <- discrim %>% ggplot(aes(gap_type, value, fill = c("col1", "col2", "col3"))) + 
+    geom_col(width = .95, position = "dodge") + 
+    scale_fill_manual(values = c("col1"="#CC79A7","col2"="#009E73","col3"="#D55E00")) + 
+    scale_x_discrete(name = "Wage Gap", limits=c("Unexplained", "Observed", "Expected")) +
+    ylab("") +
+    theme_fivethirtyeight() +
+    theme(axis.text = element_text(size = 11), legend.position = "none", aspect.ratio = .4, 
+          panel.background =element_rect(fill = "white"), plot.background = element_rect(fill = "white")) + 
+    coord_flip() +
+    labs(#title = "Structure des salaires au Quebec", #french version
+         #subtitle = "\n Décomposition de l'écart salarial natifs (A) vs immigrants (B) \n", #french version
+         title = "The wage structure in Quebec", 
+         subtitle = 'Decomposing the wage gap between Canadian born citizens (A) and Immigrants (B)', 
+         caption = "Method: Blinder-Oaxaca \n \n ©FRPDJ, Source: StatCan_EPA-04/22")
+p8
+
+# Tableau détaillé du résultat de la décomposition de l'écart salarial
+tab %>% flextable() %>% set_caption("Wage decomposition between Canadian born (A) and Immigrant (B)")
+
+```
+
+Nous analysons de manière détaillée la formation de l'écart expliqué par les différences de caractéristiques (Figure 5). Les données chiffrées sont présentées en annexe au Tableau 12. Le niveau d'éducation élevé (EDUC.LEVEL2) et la présence au secteur des Sciences naturelles et appliquées (OCCUP.SEC3) sont les deux caractéristiques qui jouent le plus en faveur des immigrants et en défaveur des natifs. Ces caractéristiques représentent respectivement 88% et 54% de l'écart expliqué par les différences dans les dotations individuelles. Ces résultats concordent avec l'analyse descriptive de notre échantillon des salariés à l'Annexe A-2 (Tableau 11). On observe en effet que comparativement aux natifs, il y a une plus grande proportion d'immigrants ayant un niveau d'éducation élevé ou supérieur au baccalauréat7 (49,4% vs 24,6%) et concentrés dans les professions des Sciences naturelles et appliquées (14,7% vs 8,8%). Or ces critères sont valorisés positivement sur le marché du travail québécois (voir Tableau 3). Cela explique donc que le fait que les immigrants sont avantagés par ces caractéristiques.
+
+Par ailleurs, les immigrants sont favorisés par le fait d'être moins jeunes, de travailler davantage dans le secteur de la santé (OCCUP.SEC4), de travailler moins à temps partiel et plus dans les grandes entreprises. De leur côté, les non immigrants prennent de l'avantage à cause de leur meilleure répartition dans certaines catégories professionnelles (la gestion, les arts et les métiers du transport) ainsi que leur plus grande ancienneté dans l'emploi.
+
+```{r ecart_endow}
+
+#graphe de la formation des ecarts expliqués par le modèle
+#plot(results, decomposition = "twofold", group.weight = 1, components = c("explained"), 
+#     title = "Contribution des variables à la formation de l'écart expliqué")   
+#round(results$twofold$variables[[2]][,2:3],3)   #coefficients de la formation des ecarts expliqués par le modèle
+
+plot(results, components = c("endowments")) + ggtitle("Impact of workers' characteristics on wage gap")  #graphe de la formation des ecarts expliqués par les différences de caractéristiques
+
+#plot(results, components = c("interaction"))   #graphe de la formation des ecarts expliqués par les interactions
+#plot(results, components = c("coefficients")) #graphe de la formation des ecarts inexpliqués
+#round(results$threefold$variables, 3)  #coefficients de la formation des ecarts expliqués par les différences de caractéristiques
+
+# Verification des differences de caracteristiques entre immigrants et non immigrants dans l'échantillon des salariés
+#test <- round(as.data.frame(results$x), 3) %>% rename(mean_nat = x.mean.A, mean_im = x.mean.B, diff = x.mean.diff)
+#test <- test[-1,]
+#test
+
+```
+
+Avec la prise en compte des interactions, les contributions des variables dans la formation du total des écarts expliqués par le modèle changent légèrement. Certaines variables comme le statut de marié jouent en faveur des immigrants alors que d'autres, comme le niveau d'éducation moyen, avantagent les natifs (voir Figure 10 à l'Annexe A-4).
+
+```{r ecart_expl}
+#graphe de la formation des ecarts expliqués par le modèle
+plot(results, decomposition = "twofold", group.weight = 1, components = c("explained"), 
+     title = "Impact of workers' characteristics and interactions on wage gap")   
+#round(results$twofold$variables[[2]][,2:3],3)   #coefficients de la formation des ecarts expliqués par le modèle
+
+```
+
+
+## Mesure de la discrimination dans l'accès à l'emploi
+
+Nous avons vu que les immigrants sont défavorisés sur le marché du travail québécois en ce qui a trait à la rémunération. Nous nous interrogeons à présent sur leur situation en termes d'accès à l'emploi. Est-ce que les immigrants arrivent à trouver un emploi aussi rapidement que les natifs ? Les résultats au tableau de contingence en annexe (Tableau 6) nous montraient que la proportion des chômeurs longue durée ($t \geq 12$ mois) est significativement plus élevée parmi les immigrants que parmi les natifs. Nous devons néanmoins contrôler l'effet d'autres facteurs afin de pouvoir établir l'influence du statut d'immigrant sur la probabilité d'être en chômage long. Ci-dessous, nous présentons les résultats du modèle de régression de la probabilité de chômage. Nous utilisons ensuite la méthode de Fairlie afin de décomposer de l'écart observé entre les deux groupes.
+
+### Estimations par régression logistique
+
+Le Tableau 5 présente les résultats de la régression logistique de la probabilité qu'un individu en quête d'emploi sur le marché québécois se retrouve en situation de chômage long. Les variables âge, genre, statut matrimonial, éducation et statut d'immigrant ont été retenues pour la régression. Nous présentons les coefficients estimés ainsi que les Odds ratio pour chaque variable. Le statut de travailleur autonome et la catégorie professionnelle ont été exclues comme variable dans ce modèle par manque de données.
+
+Il ressort que le statut d'immigrant revêt une influence significativement positive sur la probabilité de chômage longue durée. L'Odds ratio calculé indique qu'un immigrant chômeur a 2,4 fois plus de chance de se retrouver en chômage long comparativement à un natif chômeur. L'analyse peut être complétée par une régression sur la probabilité d'être au chômage (voir Tableau 13 en annexe). Les immigrants ont également deux (2) fois plus de chance d'être au chômage. Par ailleurs, l'âge et le niveau d'éducation ont aussi un impact sur la durée du chômage.
+
+Les jeunes de moins de 30 ans ont 83% moins de chance d'être des chômeurs de longue durée. Cela peut être due au fait que les jeunes accèdent préférablement aux petits boulots non spécialisés qui sont moins bien rémunérés mais disponibles en plus grand nombre dans l'économie québécoise. Ou encore du fait que les jeunes se retirent du marché pour s'adonner aux études en cas d'une recherche d'emploi infructueuse. Cette dernière analyse nous parait plausible considérant que les jeunes se retrouve plus facilement au chômage (Annexe A-7, Tableau 13). En ce qui a trait au niveau d'éducation, plus il est élevé, moins le travailleur a la chance de se retrouver en chômage longue durée. Comparativement aux personnes à faible niveau d'éducation, la probabilité de chômage long est réduite de 65% pour les détenteurs d'un diplôme d'études post secondaire inférieures au baccalauréat et de 56% pour ceux ayant un baccalauréat ou plus. Ces résultats sont en accord avec la théorie du capital humain selon laquelle les individus constituent une ressource rare lorsqu'ils investissent dans leur formation (Vignolles, 2012). Ils peuvent par conséquent accéder plus facilement à l'emploi.
+
+```{r logit}
+baseQC.chom <- baseQC %>% filter(ISUNEMP == 1) 
+
+# Regression Logit - Chomage
+reg2 <- glm(ISUNEMP ~ YOUNG + WOMAN + MARRIED + EDUC.LEVEL + IMMIGRANT + SELF.EMP, family = binomial(link = "logit"), baseQC)
+summary(reg2)                   #Variables SELF.EMP et OCCUP.SEC ne sont pas intégrées dans la regression par manque de données
+#Variables TENURE + SYNDIC + LARGFIRM ne sont pas d'intérêt car ne concernent pas les chômeurs
+
+round(exp(coef(reg2)), 2)   #Calcul des ratio Exp^B
+
+# Regression Logit - Chomage Long
+reg3 <- glm(LONG.UNEMP ~ YOUNG + WOMAN + MARRIED + EDUC.LEVEL + IMMIGRANT , family = binomial(link = "logit"), baseQC.chom)
+summary(reg3)                   #Variables SELF.EMP et OCCUP.SEC ne sont pas intégrées dans la regression par manque de données
+                                #Variables TENURE + SYNDIC + LARGFIRM ne sont pas d'intérêt car ne concernent pas les chômeurs
+
+round(exp(coef(reg3)), 2)   #Calcul des ratio Exp^B
+
+```
+
+
+### Décomposition de l'écart de probabilité de chômage long
+
+Nous allons à présent décomposer l'écart de probabilité de chômage long observé entre les immigrants et les natifs. Tout d'abord nous vérifions l'écart entre les proportions d'individus chômeurs longue durée dans les deux groupes (Tableau 6). On remarque que 18,5% des chômeurs dans notre échantillon d'immigrants sont des chômeurs longs contre 9,2% chez les natifs. Cela donne un écart de 9,2% de probabilité de chômage long en faveur des natifs et en défaveur des immigrants. D'autres caractéristiques différencient les chômeurs parmi les immigrants et les natifs. Il y a une plus grande proportion de femmes, de mariés et de personne à éducation élevée parmi les immigrants chômeurs. Du côté des natifs, on observe une plus grande proportion de jeunes et de personnes à éducation moyenne comparativement aux immigrants.
+
+```{r diff_carac}
+#Decomposition de l'écart (natif - immigrant) de prob chomage (methode Fairlie)
+#baseQC$T.UNEMP <- with(baseQC, ISUNEMP == 1) # des regressions Oaxaca et Fairlie
+
+# 1- Caractéristiques des natifs (groupe A) vs les immigrants (groupe B)
+X.B <- model.matrix(~ ISUNEMP + YOUNG + WOMAN + MARRIED + EDUC.LEVEL, data = baseQC[baseQC$IMMIGRANT == "1",])
+X.A <- model.matrix(~ ISUNEMP + YOUNG + WOMAN + MARRIED + EDUC.LEVEL, data = baseQC[baseQC$IMMIGRANT == "0",])
+
+prop.A <- apply(X.A, 2, mean)
+prop.B <- apply(X.B, 2, mean)
+ecartAB <- prop.A - prop.B        #ecart de caracteristiques entre les groupes (natifs - immigrants)
+
+round(cbind(prop.A, prop.B, ecartAB), 3)
+```
+
+```{r diff_carac}
+#Decomposition de l'écart (natif - immigrant) de prob chomage long (methode Fairlie)
+#baseQC.chom$T.LONG.UNEMP <- with(baseQC.chom, LONG.UNEMP == 1) # des regressions Oaxaca et Fairlie
+
+# 1- Caractéristiques des natifs (groupe A) vs les immigrants (groupe B)
+X.B <- model.matrix(~ LONG.UNEMP + YOUNG + WOMAN + MARRIED + EDUC.LEVEL, data = baseQC.chom[baseQC.chom$IMMIGRANT == "1",])
+X.A <- model.matrix(~ LONG.UNEMP + YOUNG + WOMAN + MARRIED + EDUC.LEVEL, data = baseQC.chom[baseQC.chom$IMMIGRANT == "0",])
+
+prop.A <- apply(X.A, 2, mean)
+prop.B <- apply(X.B, 2, mean)
+ecartAB <- prop.A - prop.B        #ecart de caracteristiques entre les groupes (natifs - immigrants)
+
+round(cbind(prop.A, prop.B, ecartAB), 3)
+```
+
+Dans le cas-ci où l'approximation linéaire s'avère problématique, la décomposition de l'écart entre deux groupes par la méthode d'Oaxaca-Blinder n'est pas appropriée. La méthode Fairlie adaptée la modélisation non linéaire de type probit ou logit permet de contourner ce problème (INSEE, 2019). Nous utilisons ainsi cette méthode pour décomposer l'écart observé dans la probabilité de chômage long. Le résultat de la décomposition est présenté au Tableau 7.
+
+Considérant les caractéristiques des immigrants présentés au tableau précédent, on devrait y observer une probabilité de chômage long de 10,3% soit 1,1% supérieur à celle des natifs, dans le cas où ces caractéristiques étaient valorisées comme celles des natifs. Or l'écart de probabilité réellement observé entre les groupes est de 9,2%. Il y a donc près de 8,2% d'écart qui demeure inexpliqué. Cela traduit une discrimination pure en faveur des natifs et en défaveurs des immigrants pour ce qui est de l'accès à l'emploi.
+
+```{r ecart_decomp2}
+# 2- Regression logit dans le groupe des natifs (groupe A)
+reg4 <- glm(ISUNEMP ~ YOUNG + WOMAN + MARRIED + EDUC.LEVEL, family = binomial(link = "logit"),
+            data=baseQC[baseQC$IMMIGRANT == "0",])
+
+# 3- On predit les probabilités a partir des estimateurs des natifs (groupe A)
+baseQC$pA <- predict(reg4, baseQC, type = 'response')
+
+prop.cB <- mean(baseQC$pA[baseQC$IMMIGRANT == "1"], na.rm = TRUE)      #probabilité que les immigrants soient 
+                                  #au chômage si leurs caractéristiques sont valorisées comme celles des natifs
+
+expl <- prop.A[2] - prop.cB #Ecart expliqué
+expl
+inexpl <- prop.cB - prop.B[2] #Ecart inexpliqué
+inexpl
+```
+
+```{r ecart_decomp2}
+# 2- Regression logit dans le groupe des natifs (groupe A)
+reg4 <- glm(LONG.UNEMP ~ YOUNG + WOMAN + MARRIED + EDUC.LEVEL, family = binomial(link = "logit"),
+            data=baseQC.chom[baseQC.chom$IMMIGRANT == "0",])
+
+# 3- On predit les probabilités a partir des estimateurs des natifs (groupe A)
+baseQC.chom$pA <- predict(reg4, baseQC.chom, type = 'response')
+
+prop.cB <- mean(baseQC.chom$pA[baseQC.chom$IMMIGRANT == "1"], na.rm = TRUE)      #probabilité que les immigrants soient 
+                                  #en chômage long si leurs caractéristiques sont valorisées comme celles des natifs
+
+expl <- prop.A[2] - prop.cB #Ecart expliqué
+expl
+inexpl <- prop.cB - prop.B[2] #Ecart inexpliqué
+inexpl
+```
+
+Contrairement à la méthode d'Oaxaca-Blinder, la méthode Fairlie ne nous permet pas de ventiler l'écart expliqué suivant la contribution des variables de caractéristiques. Nous pouvons néanmoins approfondir l'analyse sur la base des coefficients de valorisation des caractéristiques dans le groupe des natifs (Tableau 8). Nous voyons que les jeunes et les personnes de niveau d'éducation moyenne sont plus rarement en situation de chômage long chez les natifs. Or les immigrants sont moins bien répartis dans ces catégories (voir Tableau 6). Il s'en suit donc que ces variables jouent en défaveur des immigrants et en faveurs de natifs dans la formation de l'écart expliqué.
+
+```{r reg2}
+summary(reg4)
+```
+
+### Evolution dans le temps
+Nous vérifions l'évolution dans le temps de la discrimination contre les immigrants sur le marché du travail. Notre analyse se situe sur la période allant de janvier 2021 à avril 2022, période pour laquelle les données sont rendues disponibles par Statistique Canada.
+
+```{r time_analysis}
+db$T.IMMIG <- with(db, IMMIGRANT == 1)    #Variables de type 'logical'
+
+#extract db for each survey
+db0121 <- db %>% filter(SURVYEAR==2021 & SURVMNTH==1)
+db0221 <- db %>% filter(SURVYEAR==2021 & SURVMNTH==2)
+db0321 <- db %>% filter(SURVYEAR==2021 & SURVMNTH==3)
+db0421 <- db %>% filter(SURVYEAR==2021 & SURVMNTH==4)
+db0521 <- db %>% filter(SURVYEAR==2021 & SURVMNTH==5)
+db0621 <- db %>% filter(SURVYEAR==2021 & SURVMNTH==6)
+db0721 <- db %>% filter(SURVYEAR==2021 & SURVMNTH==7)
+db0821 <- db %>% filter(SURVYEAR==2021 & SURVMNTH==8)
+db0921 <- db %>% filter(SURVYEAR==2021 & SURVMNTH==9)
+db1021 <- db %>% filter(SURVYEAR==2021 & SURVMNTH==10)
+db1121 <- db %>% filter(SURVYEAR==2021 & SURVMNTH==11)
+db1221 <- db %>% filter(SURVYEAR==2021 & SURVMNTH==12)
+
+db0122 <- db %>% filter(SURVYEAR==2022 & SURVMNTH==4)
+db0222 <- db %>% filter(SURVYEAR==2022 & SURVMNTH==4)
+db0322 <- db %>% filter(SURVYEAR==2022 & SURVMNTH==4)
+db0422 <- db %>% filter(SURVYEAR==2022 & SURVMNTH==4)
+
+#extract db for Quebec for each survey
+baseQC_0121 <- db0121 %>% filter(PROVINCE == "Québec") %>% select(c(20:34,36,))
+baseQC_0221 <- db0221 %>% filter(PROVINCE == "Québec") %>% select(c(20:34,36)) 
+baseQC_0321 <- db0321 %>% filter(PROVINCE == "Québec") %>% select(c(20:34,36)) 
+baseQC_0421 <- db0421 %>% filter(PROVINCE == "Québec") %>% select(c(20:34,36)) 
+baseQC_0521 <- db0521 %>% filter(PROVINCE == "Québec") %>% select(c(20:34,36)) 
+baseQC_0621 <- db0621 %>% filter(PROVINCE == "Québec") %>% select(c(20:34,36)) 
+baseQC_0721 <- db0721 %>% filter(PROVINCE == "Québec") %>% select(c(20:34,36)) 
+baseQC_0821 <- db0821 %>% filter(PROVINCE == "Québec") %>% select(c(20:34,36)) 
+baseQC_0921 <- db0921 %>% filter(PROVINCE == "Québec") %>% select(c(20:34,36)) 
+baseQC_1021 <- db1021 %>% filter(PROVINCE == "Québec") %>% select(c(20:34,36)) 
+baseQC_1121 <- db1121 %>% filter(PROVINCE == "Québec") %>% select(c(20:34,36)) 
+baseQC_1221 <- db1221 %>% filter(PROVINCE == "Québec") %>% select(c(20:34,36)) 
+
+baseQC_0122 <- db0122 %>% filter(PROVINCE == "Québec") %>% select(c(20:34,36)) 
+baseQC_0222 <- db0222 %>% filter(PROVINCE == "Québec") %>% select(c(20:34,36))
+baseQC_0322 <- db0322 %>% filter(PROVINCE == "Québec") %>% select(c(20:34,36))
+baseQC_0422 <- db0422 %>% filter(PROVINCE == "Québec") %>% select(c(20:34,36))
+
+#extract db (ispaid) for Quebec for each survey
+baseQC_0121p <- db0121 %>% filter(PROVINCE == "Québec" & ISPAID == 1) %>% select(c(20:34,36,37))
+baseQC_0221p <- db0221 %>% filter(PROVINCE == "Québec" & ISPAID == 1) %>% select(c(20:34,36,37)) 
+baseQC_0321p <- db0321 %>% filter(PROVINCE == "Québec" & ISPAID == 1) %>% select(c(20:34,36,37)) 
+baseQC_0421p <- db0421 %>% filter(PROVINCE == "Québec" & ISPAID == 1) %>% select(c(20:34,36,37)) 
+baseQC_0521p <- db0521 %>% filter(PROVINCE == "Québec" & ISPAID == 1) %>% select(c(20:34,36,37)) 
+baseQC_0621p <- db0621 %>% filter(PROVINCE == "Québec" & ISPAID == 1) %>% select(c(20:34,36,37)) 
+baseQC_0721p <- db0721 %>% filter(PROVINCE == "Québec" & ISPAID == 1) %>% select(c(20:34,36,37)) 
+baseQC_0821p <- db0821 %>% filter(PROVINCE == "Québec" & ISPAID == 1) %>% select(c(20:34,36,37)) 
+baseQC_0921p <- db0921 %>% filter(PROVINCE == "Québec" & ISPAID == 1) %>% select(c(20:34,36,37)) 
+baseQC_1021p <- db1021 %>% filter(PROVINCE == "Québec" & ISPAID == 1) %>% select(c(20:34,36,37)) 
+baseQC_1121p <- db1121 %>% filter(PROVINCE == "Québec" & ISPAID == 1) %>% select(c(20:34,36,37)) 
+baseQC_1221p <- db1221 %>% filter(PROVINCE == "Québec" & ISPAID == 1) %>% select(c(20:34,36,37)) 
+
+baseQC_0122p <- db0122 %>% filter(PROVINCE == "Québec" & ISPAID == 1) %>% select(c(20:34,36,37)) 
+baseQC_0222p <- db0222 %>% filter(PROVINCE == "Québec" & ISPAID == 1) %>% select(c(20:34,36,37))
+baseQC_0322p <- db0322 %>% filter(PROVINCE == "Québec" & ISPAID == 1) %>% select(c(20:34,36,37))
+baseQC_0422p <- db0422 %>% filter(PROVINCE == "Québec" & ISPAID == 1) %>% select(c(20:34,36,37))
+
+
+# examining discrimination in wages: running Oaxaca reg for each period
+resultsQC_0121p <- oaxaca(formula = SAL ~ YOUNG + WOMAN + MARRIED + EDUC.LEVEL + 
+                    OCCUP.SEC + PART.TIME + YRS.TENURE + SYNDIC + LARGFIRM | T.IMMIG, 
+                  data = baseQC_0121p, R = 100)
+resultsQC_0221p <- oaxaca(formula = SAL ~ YOUNG + WOMAN + MARRIED + EDUC.LEVEL + 
+                    OCCUP.SEC + PART.TIME + YRS.TENURE + SYNDIC + LARGFIRM | T.IMMIG, 
+                  data = baseQC_0221p, R = 100)
+resultsQC_0321p <- oaxaca(formula = SAL ~ YOUNG + WOMAN + MARRIED + EDUC.LEVEL + 
+                    OCCUP.SEC + PART.TIME + YRS.TENURE + SYNDIC + LARGFIRM | T.IMMIG, 
+                  data = baseQC_0321p, R = 100)
+resultsQC_0421p <- oaxaca(formula = SAL ~ YOUNG + WOMAN + MARRIED + EDUC.LEVEL + 
+                    OCCUP.SEC + PART.TIME + YRS.TENURE + SYNDIC + LARGFIRM | T.IMMIG, 
+                  data = baseQC_0421p, R = 100)
+resultsQC_0521p <- oaxaca(formula = SAL ~ YOUNG + WOMAN + MARRIED + EDUC.LEVEL + 
+                    OCCUP.SEC + PART.TIME + YRS.TENURE + SYNDIC + LARGFIRM | T.IMMIG, 
+                  data = baseQC_0521p, R = 100)
+#---
+resultsQC_0621p <- oaxaca(formula = SAL ~ YOUNG + WOMAN + MARRIED + EDUC.LEVEL + 
+                    OCCUP.SEC + PART.TIME + YRS.TENURE + SYNDIC + LARGFIRM | T.IMMIG, 
+                  data = baseQC_0621p, R = 100)
+resultsQC_0721p <- oaxaca(formula = SAL ~ YOUNG + WOMAN + MARRIED + EDUC.LEVEL + 
+                    OCCUP.SEC + PART.TIME + YRS.TENURE + SYNDIC + LARGFIRM | T.IMMIG, 
+                  data = baseQC_0721p, R = 100)
+resultsQC_0821p <- oaxaca(formula = SAL ~ YOUNG + WOMAN + MARRIED + EDUC.LEVEL + 
+                    OCCUP.SEC + PART.TIME + YRS.TENURE + SYNDIC + LARGFIRM | T.IMMIG, 
+                  data = baseQC_0821p, R = 100)
+resultsQC_0921p <- oaxaca(formula = SAL ~ YOUNG + WOMAN + MARRIED + EDUC.LEVEL + 
+                    OCCUP.SEC + YRS.TENURE + SYNDIC + LARGFIRM | T.IMMIG, 
+                  data = baseQC_0921p, R = 100)
+resultsQC_1021p <- oaxaca(formula = SAL ~ YOUNG + WOMAN + MARRIED + EDUC.LEVEL + 
+                    OCCUP.SEC + PART.TIME + YRS.TENURE + SYNDIC + LARGFIRM | T.IMMIG, 
+                  data = baseQC_1021p, R = 100)
+resultsQC_1121p <- oaxaca(formula = SAL ~ YOUNG + WOMAN + MARRIED + EDUC.LEVEL + 
+                    OCCUP.SEC + PART.TIME + YRS.TENURE + SYNDIC + LARGFIRM | T.IMMIG, 
+                  data = baseQC_1121p, R = 100)
+resultsQC_1221p <- oaxaca(formula = SAL ~ YOUNG + WOMAN + MARRIED + EDUC.LEVEL + 
+                    OCCUP.SEC + PART.TIME + YRS.TENURE + SYNDIC + LARGFIRM | T.IMMIG, 
+                  data = baseQC_1221p, R = 100)
+
+
+resultsQC_0122p <- oaxaca(formula = SAL ~ YOUNG + WOMAN + MARRIED + EDUC.LEVEL + 
+                    OCCUP.SEC + PART.TIME + YRS.TENURE + SYNDIC + LARGFIRM | T.IMMIG, 
+                  data = baseQC_0122p, R = 100)
+resultsQC_0222p <- oaxaca(formula = SAL ~ YOUNG + WOMAN + MARRIED + EDUC.LEVEL + 
+                    OCCUP.SEC + PART.TIME + YRS.TENURE + SYNDIC + LARGFIRM | T.IMMIG, 
+                  data = baseQC_0122p, R = 100)
+resultsQC_0322p <- oaxaca(formula = SAL ~ YOUNG + WOMAN + MARRIED + EDUC.LEVEL + 
+                    OCCUP.SEC + PART.TIME + YRS.TENURE + SYNDIC + LARGFIRM | T.IMMIG, 
+                  data = baseQC_0122p, R = 100)
+resultsQC_0422p <- oaxaca(formula = SAL ~ YOUNG + WOMAN + MARRIED + EDUC.LEVEL + 
+                    OCCUP.SEC + PART.TIME + YRS.TENURE + SYNDIC + LARGFIRM | T.IMMIG, 
+                  data = baseQC_0122p, R = 100)
+
+
+tab_res_p <- data.frame(MONTH = date c("06/21","07/21","08/21","09/21","10/21",
+                                "11/21","12/21","01/22","02/22","03/22","04/22"), 
+                      UNEXP_SAL = c(resultsQC_0621p$twofold$overall[2,4],
+                                    resultsQC_0721p$twofold$overall[2,4], resultsQC_0821p$twofold$overall[2,4],
+                                    resultsQC_0921p$twofold$overall[2,4], resultsQC_1021p$twofold$overall[2,4],
+                                    resultsQC_1121p$twofold$overall[2,4], resultsQC_1221p$twofold$overall[2,4],
+                                    resultsQC_0122p$twofold$overall[2,4], resultsQC_0222p$twofold$overall[2,4],
+                                    resultsQC_0322p$twofold$overall[2,4], resultsQC_0422p$twofold$overall[2,4]))
+
+tab_res_p %>% ggplot(aes(MONTH, UNEXP_SAL)) + geom_line(stat = "identity") + 
+  scale_x_discrete(limit=c("06/21","07/21","08/21","09/21","10/21",
+                                "11/21","12/21","01/22","02/22","03/22","04/22"))
+
+tab_res_p
+
+
+```
+
+### Comparaison entre les provinces
+
+```{r reg_oaxaca_all}
+#discrimination salariale
+base.paid <- db0422 %>% filter(ISPAID == 1)
+base.paid$T.IMMIG <- with(base.paid, IMMIGRANT == 1)    #Variables de type 'logical'
+
+baseBC.paid <- base.paid %>% filter(PROV==59)
+baseMB.paid <- base.paid %>% filter(PROV==46)
+baseON.paid <- base.paid %>% filter(PROV==35)
+
+resultsBC <- oaxaca(formula = SAL ~ YOUNG + WOMAN + MARRIED + EDUC.LEVEL + 
+                    OCCUP.SEC + PART.TIME + YRS.TENURE + SYNDIC + LARGFIRM | T.IMMIG, 
+                  data = baseBC.paid, R = 100)
+resultsMB <- oaxaca(formula = SAL ~ YOUNG + WOMAN + MARRIED + EDUC.LEVEL + 
+                    OCCUP.SEC + PART.TIME + YRS.TENURE + SYNDIC + LARGFIRM | T.IMMIG, 
+                  data = baseMB.paid, R = 100)
+resultsON <- oaxaca(formula = SAL ~ YOUNG + WOMAN + MARRIED + EDUC.LEVEL + 
+                    OCCUP.SEC + PART.TIME + YRS.TENURE + SYNDIC + LARGFIRM | T.IMMIG, 
+                  data = baseON.paid, R = 100)
+
+
+#discrimination dans l'accès emploi
+baseBC <- db0422 %>% filter(PROV==59)
+baseMB <- db0422 %>% filter(PROV==46)
+baseON <- db0422 %>% filter(PROV==35)
+
+# 1- Caractéristiques des natifs (groupe A) vs les immigrants (groupe B)
+X.B_BC <- model.matrix(~ ISUNEMP + YOUNG + WOMAN + MARRIED + EDUC.LEVEL, data = baseBC[baseBC$IMMIGRANT == "1",])
+X.A_BC <- model.matrix(~ ISUNEMP + YOUNG + WOMAN + MARRIED + EDUC.LEVEL, data = baseBC[baseBC$IMMIGRANT == "0",])
+
+X.B_MB <- model.matrix(~ ISUNEMP + YOUNG + WOMAN + MARRIED + EDUC.LEVEL, data = baseMB[baseMB$IMMIGRANT == "1",])
+X.A_MB <- model.matrix(~ ISUNEMP + YOUNG + WOMAN + MARRIED + EDUC.LEVEL, data = baseMB[baseMB$IMMIGRANT == "0",])
+
+X.B_ON <- model.matrix(~ ISUNEMP + YOUNG + WOMAN + MARRIED + EDUC.LEVEL, data = baseON[baseON$IMMIGRANT == "1",])
+X.A_ON <- model.matrix(~ ISUNEMP + YOUNG + WOMAN + MARRIED + EDUC.LEVEL, data = baseON[baseON$IMMIGRANT == "0",])
+
+prop.A_BC <- apply(X.A_BC, 2, mean)
+prop.B_BC <- apply(X.B_BC, 2, mean)
+ecartAB_BC <- prop.A_BC - prop.B_BC        #ecart de caracteristiques entre les groupes (natifs - immigrants)
+
+prop.A_MB <- apply(X.A_MB, 2, mean)
+prop.B_MB <- apply(X.B_MB, 2, mean)
+ecartAB_MB <- prop.A_MB - prop.B_MB  
+
+prop.A_ON <- apply(X.A_ON, 2, mean)
+prop.B_ON <- apply(X.B_ON, 2, mean)
+ecartAB_ON <- prop.A_ON - prop.B_ON  
+
+#round(cbind(prop.A, prop.B, ecartAB), 3)
+
+# Regression logit dans les groupes des natifs (groupe A) des differentes provinces
+reg5 <- glm(ISUNEMP ~ YOUNG + WOMAN + MARRIED + EDUC.LEVEL + SELF.EMP, family = binomial(link = "logit"),
+            data=baseBC[baseBC$IMMIGRANT == "0",])
+reg6 <- glm(ISUNEMP ~ YOUNG + WOMAN + MARRIED + EDUC.LEVEL + SELF.EMP, family = binomial(link = "logit"),
+            data=baseMB[baseMB$IMMIGRANT == "0",])
+reg7 <- glm(ISUNEMP ~ YOUNG + WOMAN + MARRIED + EDUC.LEVEL + SELF.EMP, family = binomial(link = "logit"),
+            data=baseON[baseON$IMMIGRANT == "0",])
+summary(reg5)
+summary(reg6)
+summary(reg7)
+
+# Pour chaque province, on prédit les probabilités à partir des estimateurs des natifs (groupe A)
+baseBC$pA <- predict(reg5, baseBC, type = 'response')
+baseMB$pA <- predict(reg6, baseMB, type = 'response')
+baseON$pA <- predict(reg7, baseON, type = 'response')
+
+# Probabilités que les immigrants soient en chômage long si leurs caractéristiques sont valorisées comme celles des natifs, dans les différentes provinces
+prop.cB_BC <- mean(baseBC$pA[baseBC$IMMIGRANT == "1"], na.rm = TRUE)
+prop.cB_MB <- mean(baseMB$pA[baseMB$IMMIGRANT == "1"], na.rm = TRUE)
+prop.cB_ON <- mean(baseON$pA[baseON$IMMIGRANT == "1"], na.rm = TRUE)
+
+#Ecart de proba de chômage long expliqué par les différences de caractéristiques
+#expl <- prop.A[2] - prop.cB 
+expl_BC <- prop.A_BC[2] - prop.cB_BC
+expl_MB <- prop.A_MB[2] - prop.cB_MB
+expl_ON <- prop.A_ON[2] - prop.cB_ON
+
+#Ecart de proba de chômage long inexpliqué par les modèles
+#inexpl <- prop.cB - prop.B[2] #Ecart inexpliqué
+inexpl_BC <- prop.cB_BC - prop.B_BC[2]
+inexpl_MB <- prop.cB_MB - prop.B_MB[2]
+inexpl_ON <- prop.cB_ON - prop.B_ON[2]
+
+
+tab_all <- data.frame(PROV = c("QC","BC","MB","ON"), 
+                      UNEXP_SAL = c(results$twofold$overall[2,4], resultsBC$twofold$overall[2,4],
+                                resultsMB$twofold$overall[2,4], resultsON$twofold$overall[2,4]),
+                      UNEXP_pCHOM = c(inexpl, inexpl_BC,inexpl_MB, inexpl_ON) )
+tab_all
+
+# Graphs
+tab_all %>% ggplot(aes(UNEXP_pCHOM, UNEXP_SAL, label=PROV)) + geom_point(size=4, aes(col=PROV)) +
+  ggrepel::geom_text_repel(aes(col=PROV)) +
+  geom_vline(xintercept = 0) + geom_hline(yintercept = 0) + 
+  scale_x_continuous(limits = c(-0.1, 0.1)) + 
+  scale_y_continuous(limits = c(0, 6)) + 
+  theme_economist_white() + 
+  theme(legend.position = "none", axis.text = element_text(size = 12), legend.text =  element_text(size = 12))+
+  labs(title = "Labor market discrimination toward immigrants in Canada", 
+       subtitle="\nComparing Quebec to other Provinces\n", 
+       caption = "©FRPDJ, Source:StatCan-04/2022")
+
+```
+
+
+# CONCLUSION
+
+Ce travail a permis de mettre en lumière l'existence d'une discrimination contre les immigrants au Québec tant au niveau de l'accès à l'emploi que de la rémunération salariale. Ces derniers sont donc doublement défavorisés sur le marché du travail.
+
+Au niveau de l'accès à l'emploi, la situation est plus compliquée pour les immigrants comparés aux natifs. En effet, les immigrants ont deux fois plus de chance de se retrouver au chômage. Par ailleurs, un immigrant chômeur a 2,4 fois plus de chance d'expérimenter un chômage longue durée (au moins 12 mois) par rapport à un natif. Les probabilités de chômage long observées dans le groupe des immigrants et des natifs chômeurs sont respectivement 18,5% et 9,2%. Or la probabilité chez les immigrants devait être de 10,3% si leurs caractéristiques étaient valorisées comme celles des natifs. On n'arrive donc à expliquer ce surplus de probabilité de chômage long de 8,2% chez les immigrants chômeurs que par une discrimination purement négative à l'encontre de ces derniers.
+
+Au niveau de la rémunération salariale, un immigrant gagne environ 10% de moins qu'un natif à compétence égale, soit environ 3,2\$/h de moins. Il s'agit là d'un acte de discrimination. En moyenne, un immigrant gagne 29,5\$/h contre 30,3%/h pour un natif, ce qui correspond à un écart observé de 0,8\$/h. En prenant les natifs comme référence pour la valorisation des caractéristiques, nous voyons que le salaire moyen des immigrants devrait être de 32,9\$/h compte tenu des caractéristiques de leur groupe versus celles des natifs. Ce surplus contrefactuel de 2,6\$/h s'expliquerait par les avantages que les immigrants retireraient notamment de leur plus grande proportion d'individus ayant un niveau d'éducation élevé et de travailleurs dans le secteur des Sciences naturelles et appliquées. Il y a donc un écart inexpliqué de 3,4\$ entre le salaire horaire moyen que les immigrants auraient dû percevoir et ce qu'ils perçoivent dans la réalité.
+
+Dans la vision d'un monde équitable et juste, les résultats de ce travail appellent à un renforcement des politiques d'insertion professionnelle et de lutte contre les discriminations envers les immigrants au Québec.
+
+# BIBLIOGRAPHIE

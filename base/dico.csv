@@ -1,0 +1,404 @@
+Position / ;;;;;;;;;;;;;
+"Longueur""";Start / ;;;;;;;;;;;;
+"Début""";Start / ;;;;;;;;;;;;
+"Fin""";Variable / ;;;;;;;;;;;;
+"Variable""";Variable Name - English / ;;;;;;;;;;;;
+"Nom de Variable - Anglais""";Variable Name - French / ;;;;;;;;;;;;
+"Nom de Variable - Francais""";Note 1 - English;Note 1 - French;Note 2 - English;Note 2 - French;Code / ;;;;;;;;
+"Code""";Label - English /;;;;;;;;;;;;
+"Étiquette - Anglais""";Label - French /;;;;;;;;;;;;
+"Étiquette - Francais""";;;;;;;;;;;;;
+1;7;1976;;rec_num;Order of record in file;Ordre de l'observation dans le fichier;;;;;;;
+;;;;;;;;;;;1-9999999;;
+8;4;1976;;survyear;Survey year;Année d'enquête;;;;;;;
+;;;;;;;;;;;-1976;;
+12;2;1976;;survmnth;Survey month;Mois d'enquête;;;;; ;;
+;;;;;;;;;;;1;January;Janvier
+;;;;;;;;;;;2;February;Février
+;;;;;;;;;;;3;March;Mars
+;;;;;;;;;;;4;April;Avril
+;;;;;;;;;;;5;May;Mai
+;;;;;;;;;;;6;June;Juin
+;;;;;;;;;;;7;July;Juillet
+;;;;;;;;;;;8;August;Août
+;;;;;;;;;;;9;September;Septembre
+;;;;;;;;;;;10;October;Octobre
+;;;;;;;;;;;11;November;Novembre
+;;;;;;;;;;;12;December;Décembre
+14;1;2017;; lfsstat    ;Labour force status;Situation d'activité;;;;;;;
+;;;;;;;;;;;1;Employed, at work;Personnes occupées, au travail
+;;;;;;;;;;;2;Employed, absent from work;Personnes occupées, absentes du travail
+;;;;;;;;;;;3;Unemployed;Chômeurs
+;;;;;;;;;;;4;Not in labour force;Inactifs
+15;2;1976;;prov;Province;Province;;;;;;;
+;;;;;;;;;;;10;Newfoundland and Labrador;Terre-Neuve-et-Labrador
+;;;;;;;;;;;11;Prince Edward Island;Île-du-Prince-Édouard
+;;;;;;;;;;;12;Nova Scotia;Nouvelle-Écosse
+;;;;;;;;;;;13;New Brunswick;Nouveau-Brunswick
+;;;;;;;;;;;24;Quebec;Québec
+;;;;;;;;;;;35;Ontario;Ontario
+;;;;;;;;;;;46;Manitoba;Manitoba
+;;;;;;;;;;;47;Saskatchewan;Saskatchewan
+;;;;;;;;;;;48;Alberta;Alberta
+;;;;;;;;;;;59;British Columbia;Colombie-Britannique
+17;1;2017;;cma;Nine largest CMAs;Neuf plus grandes RMR;;;;;;;
+;;;;;;;;;;;1;Québec;Québec
+;;;;;;;;;;;2;Montréal;Montréal
+;;;;;;;;;;;3;Ottawa–Gatineau (Ontario part);Ottawa–Gatineau (partie de l’Ontario)
+;;;;;;;;;;;4;Toronto;Toronto
+;;;;;;;;;;;5;Hamilton;Hamilton
+;;;;;;;;;;;6;Winnipeg;Winnipeg
+;;;;;;;;;;;7;Calgary;Calgary
+;;;;;;;;;;;8;Edmonton;Edmonton
+;;;;;;;;;;;9;Vancouver;Vancouver
+;;;;;;;;;;;0;Other CMA or non-CMA;Autres RMR ou non-RMR
+18;2;1976;;age_12;Five-year age group of respondent;L'âge du répondant (groupes de 5 ans);;;;;;;
+;;;;;;;;;;;1;15 to 19 years;15 à 19 ans
+;;;;;;;;;;;2;20 to 24 years;20 à 24 ans
+;;;;;;;;;;;3;25 to 29 years;25 à 29 ans
+;;;;;;;;;;;4;30 to 34 years;30 à 34 ans
+;;;;;;;;;;;5;35 to 39 years;35 à 39 ans
+;;;;;;;;;;;6;40 to 44 years;40 à 44 ans
+;;;;;;;;;;;7;45 to 49 years;45 à 49 ans
+;;;;;;;;;;;8;50 to 54 years;50 à 54 ans
+;;;;;;;;;;;9;55 to 59 years;55 à 59 ans
+;;;;;;;;;;;10;60 to 64 years;60 à 64 ans
+;;;;;;;;;;;11;65 to 69 years;65 à 69 ans
+;;;;;;;;;;;12;70 and over;70 et plus
+20;1;1976;;age_6    ;Age in 2 and 3 year groups, 15 to 29;L'âge des personnes de 15 à 29 ans (groupes de 2 et 3 ans);;;;;;;
+;;;;;;;;;;;1;15 to 16 years;15 à 16 ans
+;;;;;;;;;;;2;17 to 19 years;17 à 19 ans
+;;;;;;;;;;;3;20 to 21 years;20 à 21 ans
+;;;;;;;;;;;4;22 to 24 years;22 à 24 ans
+;;;;;;;;;;;5;25 to 26 years;25 à 26 ans
+;;;;;;;;;;;6;27 to 29 years;27 à 29 ans
+;;;;;;;;;;;blank;Not applicable;Indisponible
+21;1;1976;;sex;Sex of respondent;Sexe du répondant;;;;;;;
+;;;;;;;;;;;1;Male;Hommes
+;;;;;;;;;;;2;Female;Femmes
+22;1;Nov. 1999; ;marstat;Marital status of respondent;État matrimonial du répondant;;;;;;;
+;;;;;;;;;;;1;Married;Marié(e)s
+;;;;;;;;;;;2;Living in common-law;Vivant en union libre
+;;;;;;;;;;;3;Widowed;Veuf(ve)s
+;;;;;;;;;;;4;Separated;Séparé(e)s
+;;;;;;;;;;;5;Divorced;Divorcé(e)s
+;;;;;;;;;;;6;Single, never married;Célibataires, n'ont jamais marié(e)s
+24;1;1990;;educ;Highest educational attainment;Plus haut niveau de scolarité atteint;;;;;;;
+;;;;;;;;;;;0;0 to 8 years;0 à 8 années
+;;;;;;;;;;;1;Some high school;Études secondaires partielles
+;;;;;;;;;;;2;High school graduate;Études secondaires complétées
+;;;;;;;;;;;3;Some postsecondary;Études postsecondaires partielles
+;;;;;;;;;;;4;Postsecondary certificate or diploma;Diplôme ou certificat d'études postsecondaires
+;;;;;;;;;;;5;Bachelor's degree;Baccalauréat
+;;;;;;;;;;;6;Above bachelor's degree;Diplôme ou certificat universitaire supérieur au baccalauréat
+25;1;1976;;mjh;Single or multiple jobholder;Personnes ayant un emploi ou plus d'un emploi;;;;;;;
+;;;;;;;;;;;1;Single jobholder, including job changers;Personnes ayant un emploi, incluant ceux ayant changé d'emploi
+;;;;;;;;;;;2;Multiple jobholder;Personnes ayant plus d'un emploi
+;;;;;;;;;;;blank;Not applicable;Indisponible
+26;1;1976;;everwork;Not currently employed, worked in the past;Ne travaillent pas présentement, ont déjà travaillé;;;;;;;
+;;;;;;;;;;;1;Yes, within last year;Oui, au cours de la dernière année
+;;;;;;;;;;;2;Yes, more than 1 year ago;Oui, il y a plus d'un an
+;;;;;;;;;;;3;No, never worked;Non, n'ont jamais travaillé
+;;;;;;;;;;;blank;Not applicable;Indisponible
+27;1;1976;;ftptlast;Full- or part-time status of last job;Situation du dernier emploi, temps plein ou temps partiel;;;;;;;
+;;;;;;;;;;;1;Full-time (30 hours or more);Temps plein (30 heures ou plius)
+;;;;;;;;;;;2;Part-time (1 to 29 hours);Temps partiel (1à 29 heures)
+;;;;;;;;;;;blank;Not applicable;Indisponible
+28;1;1976;;cowmain;Class of worker, main job;Catégorie de travailleur, emploi principal;Currently employed or worked within the past 12 months;Présentement occupé ou travaillé au cours des 12 derniers mois;;;;;
+;;;;;;;;;;;1;Public sector employees;Employés du secteur public
+;;;;;;;;;;;2;Private sector employees;Employés du secteur privé
+;;;;;;;;;;;3;Self-employed incorporated, with paid help;Entreprise constituée en société, avec aide rémunérée
+;;;;;;;;;;;4;Self-employed incorporated, no paid help;Entreprise constituée en société, sans aide rémunérée
+;;;;;;;;;;;5;Self-employed unincorporated, with paid help;Entreprise non constituée en société, avec aide rémunérée
+;;;;;;;;;;;6;Self-employed unincorporated, no paid help;Entreprise non constituée en société, sans aide rémunérée
+;;;;;;;;;;;7;Unpaid family worker;Travailleurs familiaux non rémunérés
+;;;;;;;;;;;blank;Not applicable;Indisponible
+29;1;2017;;immig;Immigrant status;Statut d'immigrant;;;;;;;
+;;;;;;;;;;;1;Immigrant, landed 10 or less years earlier;Immigrants reçus 10 ans et moins auparavant
+;;;;;;;;;;;2;Immigrant, landed more than 10 years earlier;Immigrants reçus plus de 10 ans auparavant
+;;;;;;;;;;;3;Non-immigrant;Non immigrant
+33;2;2017;;naics_21;Industry of main job;Industrie de l'emploi principal ;Currently employed or worked within the past 12 months;Présentement occupé ou travaillé au cours des 12 derniers mois;Codes based on the 2017 NAICS;Codes selon le SCIAN de 2017;;;
+;;;;;;;;;111-112, 1100, 1151-1152;111-112, 1100, 1151-1152;1;Agriculture;Agriculture
+;;;;;;;;;113, 1153;113, 1153;2;Forestry and logging and support activities for forestry;Foresterie et exploitation forestière et activités de soutien à la foresterie
+;;;;;;;;;114;114;3;Fishing, hunting and trapping;Pêche, chasse et piégeage
+;;;;;;;;;21, 2100;21, 2100;4;Mining, quarrying, and oil and gas extraction;Extraction minière, exploitation en carrière, et extraction de pétrole et de gaz
+;;;;;;;;;22;22;5;Utilities;Services publics
+;;;;;;;;;23;23;6;Construction;Construction
+;;;;;;;;;321, 327, 331-337;321, 327, 331-337;7;Manufacturing - durable goods;Fabrication de biens durables
+;;;;;;;;;311-316, 322-326, 339;311-316, 322-326, 339;8;Manufacturing - non-durable goods;Fabrication de biens non durables
+;;;;;;;;;41;41;9;Wholesale trade;Commerce de gros 
+;;;;;;;;;44-45;44-45;10;Retail trade;Commerce de détail
+;;;;;;;;;48-49;48-49;11;Transportation and warehousing;Transport et entreposage 
+;;;;;;;;;52;52;12;Finance and insurance;Finances et assurances
+;;;;;;;;;53;53;13;Real estate and rental and leasing;Services immobiliers et services de location et de location à bail
+;;;;;;;;;54;54;14;Professional, scientific and technical services;Services professionnels, scientifiques et techniques
+;;;;;;;;;55-56;55-56;15;Business, building and other support services;Services aux entreprises, services relatifs aux bâtiments et autres services de soutien
+;;;;;;;;;61;61;16;Educational services;Services d'enseignement
+;;;;;;;;;62;62;17;Health care and social assistance;Soins de santé et assistance sociale
+;;;;;;;;;51, 71;51, 71;18;Information, culture and recreation;Information, culture et loisirs
+;;;;;;;;;72;72;19;Accommodation and food services;Hébergement et services de restauration
+;;;;;;;;;81;81;20;Other services (except public administration);Autres services (sauf les administrations publiques)
+;;;;;;;;;91;91;21;Public administration;Administrations publiques
+;;;;;;;;;;;blank;Not applicable;Indisponible
+41;2;2017;;noc_10    ;Occupation at main job;Profession à l'emploi principal;Currently employed or worked within the past 12 months;Présentement occupé ou travaillé au cours des 12 derniers mois;Codes based on the 2016 NOC;Codes selon le CNP de 2016;;;
+;;;;;;;;;0;0;1;Management occupations;Gestion
+;;;;;;;;;1;1;2;Business, finance and administration occupations;Affaires, finance et administration
+;;;;;;;;;2;2;3;Natural and applied sciences and related occupations;Sciences naturelles et appliquées et domaines apparentés
+;;;;;;;;;3;3;4;Health occupations;Secteur de la santé
+;;;;;;;;;4;4;5;Occupations in education, law and social, community and government services;Enseignement, droit et services sociaux, communautaires et gouvernementaux
+;;;;;;;;;5;5;6;Occupations in art, culture, recreation and sport;Arts, culture, sports et loisirs
+;;;;;;;;;6;6;7;Sales and service occupations;Vente et services
+;;;;;;;;;7;7;8;Trades, transport and equipment operators and related occupations;Métiers, transport, machinerie et domaines apparentés
+;;;;;;;;;8;8;9;Natural resources, agriculture and related production occupations;Ressources naturelles, agriculture et production connexe
+;;;;;;;;;9;9;10;Occupations in manufacturing and utilities;Fabrication et services d'utilité publique
+;;;;;;;;;;;blank;Not applicable;Indisponible
+43;2;2017;;noc_40    ;Occupation at main job;Profession à l'emploi principal;Currently employed or worked within the past 12 months;Présentement occupé ou travaillé au cours des 12 derniers mois;Codes based on the 2016 NOC;Codes selon le CNP de 2016;;;
+;;;;;;;;;0;0;1;Senior management occupations;Cadres supérieurs
+;;;;;;;;;05-janv;05-janv;2;Specialized middle management occupations;Cadres intermédiaires spécialisés
+;;;;;;;;;6;6;3;Middle management occupations in retail and wholesale trade and customer services;Cadres intermédiaires dans le commerce de détail, de gros et des services à la clientèle
+;;;;;;;;;09-juil;09-juil;4;Middle management occupations in trades, transportation, production and utilities;Cadres intermédiaires des métiers, des transports, de la production et des services d'utilité publique
+;;;;;;;;;11;11;5;Professional occupations in business and finance;Personnel professionnel en gestion des affaires et en finance
+;;;;;;;;;12;12;6;Administrative and financial supervisors and administrative occupations;Personnel de supervision du travail administratif et financier et personnel administratif
+;;;;;;;;;13;13;7;Finance, insurance and related business administrative occupations;Personnel en finance, assurance et personnel assimilé en administration des affaires
+;;;;;;;;;14;14;8;Office support occupations;Personnel de soutien de bureau
+;;;;;;;;;15;15;9;Distribution, tracking and scheduling co-ordination occupations;Personnel de coordination de la distribution, du suivi et des horaires
+;;;;;;;;;21;21;10;Professional occupations in natural and applied sciences;Personnel professionnel des sciences naturelles et appliquées
+;;;;;;;;;22;22;11;Technical occupations related to natural and applied sciences;Personnel technique assimilé aux sciences naturelles et appliquées
+;;;;;;;;;30;30;12;Professional occupations in nursing;Personnel professionnel en soins infirmiers
+;;;;;;;;;31;31;13;Professional occupations in health (except nursing);Personnel professionnel des soins de santé (sauf soins infirmiers)
+;;;;;;;;;32;32;14;Technical occupations in health;Personnel technique des soins de santé
+;;;;;;;;;34;34;15;Assisting occupations in support of health services;Personnel de soutien des services de santé
+;;;;;;;;;40;40;16;Professional occupations in education services;Personnel professionnel en services d'enseignement
+;;;;;;;;;41;41;17;Professional occupations in law and social, community and government services;Personnel professionnel du droit et des services gouvernementaux, sociaux et communautaires
+;;;;;;;;;42;42;18;Paraprofessional occupations in legal, social, community and education services;Personnel paraprofessionnel des services juridiques, sociaux, communautaires et de l'enseignement
+;;;;;;;;;43;43;19;Occupations in front-line public protection services;Personnel des services de protection publique de première ligne
+;;;;;;;;;44;44;20;Care providers and educational, legal and public protection support occupations;Dispensateurs de soins et personnel de soutien en enseignement, en droit et en protection publique
+;;;;;;;;;51;51;21;Professional occupations in art and culture;Personnel professionnel des arts et de la culture
+;;;;;;;;;52;52;22;Technical occupations in art, culture, recreation and sport;Personnel technique des arts, de la culture, des sports et des loisirs
+;;;;;;;;;62;62;23;Retail sales supervisors and specialized sales occupations;Personnel de supervision des ventes au détail et personnel des ventes spécialisées
+;;;;;;;;;63;63;24;Service supervisors and specialized service occupations;Personnel de supervision en services et personnel de services spécialisés
+;;;;;;;;;64;64;25;Sales representatives and salespersons - wholesale and retail trade;Représentants des ventes et vendeurs - commerce de gros et de détail
+;;;;;;;;;65;65;26;Service representatives and other customer and personal services occupations;Représentants de services et autre personnel de services à la clientèle et personnalisés
+;;;;;;;;;66;66;27;Sales support occupations;Personnel de soutien des ventes
+;;;;;;;;;67;67;28;Service support and other service occupations, n.e.c.;Personnel de soutien en service et autre personnel de service, n.c.a.
+;;;;;;;;;72;72;29;Industrial, electrical and construction trades;Personnel des métiers de l'électricité, de la construction et des industries
+;;;;;;;;;73;73;30;Maintenance and equipment operation trades;Personnel des métiers d'entretien et d'opération d'équipement
+;;;;;;;;;74;74;31;Other installers, repairers and servicers and material handlers;Personnel d'installation, de réparation et d'entretien et manutentionnaires
+;;;;;;;;;75;75;32;Transport and heavy equipment operation and related maintenance occupations;Personnel en opération d'équipement de transport et de machinerie lourde et autre personnel assimilé à l'entretien
+;;;;;;;;;76;76;33;Trades helpers, construction labourers and related occupations;Personnel de soutien des métiers, manœuvres et aides d'entreprise en construction et autre personnel assimilé
+;;;;;;;;;82;82;34;Supervisors and technical occupations in natural resources, agriculture and related production;Superviseurs et métiers techniques dans les ressources naturelles, l'agriculture et la production connexe
+;;;;;;;;;84;84;35;Workers in natural resources, agriculture and related production;Personnel en ressources naturelles, en agriculture et en production connexe
+;;;;;;;;;86;86;36;Harvesting, landscaping and natural resources labourers;Manœuvres à la récolte, en aménagement paysager et en ressources naturelles
+;;;;;;;;;92;92;37;Processing, manufacturing and utilities supervisors and central control operators;Personnel de supervision dans la transformation, la fabrication et les services d'utilité publique et opérateurs de poste central de contrôle
+;;;;;;;;;94;94;38;Processing and manufacturing machine operators and related production workers;Opérateurs de machinerie reliée à la transformation et à la fabrication et autre personnel assimilé
+;;;;;;;;;95;95;39;Assemblers in manufacturing;Monteurs dans la fabrication
+;;;;;;;;;96;96;40;Labourers in processing, manufacturing and utilities;Manœuvres dans la transformation, la fabrication et les services d'utilité publique
+;;;;;;;;;;;blank;Not applicable;Indisponible
+45;1;1976;;yabsent;Reason of absence, full week;Raison d'absence, toute la semaine;;;;;;;
+;;;;;;;;;;;0;Other reasons;Autre raisons
+;;;;;;;;;;;1;Own illness or disability;Maladie ou incapacité
+;;;;;;;;;;;2;Personal or family responsibilities;Obligations personnelles ou familiales
+;;;;;;;;;;;3;Vacation;Vacances
+;;;;;;;;;;;blank;Not applicable;Indisponible
+46;2;1976;;wksaway;Number of weeks absent from work;Nombre de semaines d'absence du travail;;;;;;;
+;;;;;;;;;;;janv-99;;
+;;;;;;;;;;;blank;Not applicable;Indisponible
+48;1;1976;;payaway;Paid for time off, full-week absence only;Congé rémunéré, absence de toute la semaine seulement;Includes employees and self-employed - incorporated only;Comprend les employés et les travailleurs autonomes avec entreprise constituée en société seulement;;;;;
+;;;;;;;;;;;1;Yes;Oui
+;;;;;;;;;;;2;No;Non
+;;;;;;;;;;;blank;Not applicable;Indisponible
+49;3;1976;;uhrsmain;Usual hours worked per week at main job;Heures habituellement travaillées par semaine à l'emploi principal;Currently employed only;Présentement occupé seulement;;;;;
+;;;;;;;;;;;1-990;0.1-99.0 (implied decimal);0,1-99,0 (décimal implicite)
+;;;;;;;;;;;blank;Not applicable;Indisponible
+52;3;1976;;ahrsmain;Actual hours worked per week at main job;Heures effectivement travaillées par semaine à l'emploi principal;Currently employed only;Présentement occupé seulement;;;;;
+;;;;;;;;;;;0-990;0.0-99.0 (implied decimal);0,0-99,0 (décimal implicite)
+;;;;;;;;;;;blank;Not applicable;Indisponible
+55;1;1976;;ftptmain;Full- or part-time status at main or only job;Temps plein ou temps partiel, emp. princ. ou seul emploi ;Currently employed only;Présentement occupé seulement;;;;;
+;;;;;;;;;;;1;Full-time;Temps plein
+;;;;;;;;;;;2;Part-time;Temps partiel
+;;;;;;;;;;;blank;Not applicable;Indisponible
+56;3;1976;;utothrs;Usual hours worked per week at all jobs;Heures habituellement travaillées par semaine à tous les emplois;Currently employed only;Présentement occupé seulement;;;;;
+;;;;;;;;;;;1-990;0.1-99.0 (implied decimal);0,1-99,0 (décimal implicite)
+;;;;;;;;;;;blank;Not applicable;Indisponible
+59;3;1976;;atothrs;Actual hours worked per week at all jobs;Heures effectivement travaillées par semaine à tous les emplois;Currently employed only;Présentement occupé seulement;;;;;
+;;;;;;;;;;;0-990;0.0-99.0 (implied decimal);0,0-99,0 (décimal implicite)
+;;;;;;;;;;;blank;Not applicable;Indisponible
+62;3;1976;;hrsaway;Hours away from work, part-week absence only;Heures d'absence du travail, absence d'une partie de la semaine seulement;;;;;;;
+;;;;;;;;;;;0-990;0.0-99.0 (implied decimal);0,0-99,0 (décimal implicite)
+;;;;;;;;;;;blank;Not applicable;Indisponible
+65;1;1976;;yaway;Reason for part-week absence;Raison pour l'absence durant une partie de la semaine;Employees at work only;Employés au travail seulement;;;;;
+;;;;;;;;;;;0;Other reasons;Autre raisons
+;;;;;;;;;;;1;Own illness or disability;Maladie ou incapacité
+;;;;;;;;;;;2;Personal or family responsibilities;Obligations personnelles ou familiales
+;;;;;;;;;;;3;Vacation or civic holiday;Vacances ou congés
+;;;;;;;;;;;4;Working short-time;Travail à temps réduit
+;;;;;;;;;;;blank;Not applicable;Indisponible
+66;3;1997;;paidot;Paid overtime hours in reference week;Heures supplémentaires rémunérées durant la semaine de référence;Employees at work only;Employés au travail seulement;;;;;
+;;;;;;;;;;;0-990;0.0-99.0 (implied decimal);0,0-99,0 (décimal implicite)
+;;;;;;;;;;;blank;Not applicable;Indisponible
+69;3;1997;;unpaidot;Unpaid overtime hours in reference week;Heures supplémentaires non rémunérées durant la semaine de référence;Employees at work only;Employés au travail seulement;;;;;
+;;;;;;;;;;;0-990;0.0-99.0 (implied decimal);0,0-99,0 (décimal implicite)
+;;;;;;;;;;;blank;Not applicable;Indisponible
+72;3;1976;;xtrahrs;Number of overtime or extra hours worked;Nombre d'heures supplémentaires travaillées;Employees at work only;Employés au travail seulement;;;;;
+;;;;;;;;;;;0-990;0.0-99.0 (implied decimal);0,0-99,0 (décimal implicite)
+;;;;;;;;;;;blank;Not applicable;Indisponible
+76;1;1997;;whypt;Reason for part-time work;Raison pour le travail à temps partiel;;;;;;;
+;;;;;;;;;;;0;Other reasons;Autre raisons
+;;;;;;;;;;;1;Own illness or disability;Maladie ou incapacité
+;;;;;;;;;;;2;Caring for children;Soins des enfants
+;;;;;;;;;;;3;Other personal or family responsibilities;Autres obligations personnelles ou familiales
+;;;;;;;;;;;4;Going to school;École
+;;;;;;;;;;;5;Personal preference;Choix personnel
+;;;;;;;;;;;6;Business conditions or could not find full-time work, looked for full-time work in last month;Conjoncture économique ou n'a pu trouver du travail à temps plein, a cherché du temps plein au cours du dernier mois
+;;;;;;;;;;;7;Business conditions or could not find full-time work, did not look for full-time work in last month;Conjoncture économique ou n'a pu trouver du travail à temps plein, n'a pas cherché du temps plein au cours du dernier mois
+;;;;;;;;;;;blank;Not applicable;Indisponible
+77;3;1976;;tenure;Job tenure with current employer (months);Durée de l'emploi avec l'employeur actuel (mois);;;;;;;
+;;;;;;;;;;;1-240;;
+;;;;;;;;;;;blank;Not applicable;Indisponible
+80;3;1976;;prevten;Job tenure with previous employer (months);Durée de l'emploi avec l'employeur précédent (mois);Not currently employed but worked in the past 12 months;Présentement non occupé mais à travaillé au cours des 12 derniers mois;;;;;
+;;;;;;;;;;;1-240;;
+;;;;;;;;;;;blank;Not applicable;Indisponible
+83;6;1997;;hrlyearn;Usual hourly wages, employees only;Salaire horaire habituel, employés seulement;Includes tips, commission and bonuses;Comprend les pourboires, les commissions et les primes;Before taxes and other deductions;Avant impôt et autres déductions;;;
+;;;;;;;;;;;1-999999;$0.01-$9999.99 (two decimals implied);0,01 $-9999,99 $ (deux décimales implicites)
+;;;;;;;;;;;blank;Not applicable;Indisponible
+89;1;1997;;union;Union status, employees only;Situation syndicale, employés seulement;;;;;;;
+;;;;;;;;;;;1;Union member;Membre d’un syndicat
+;;;;;;;;;;;2;Not a member but covered by a union contract or collective agreement;N’est pas membre d’un syndicat mais est couvert par une convention collective ou par un contrat de travail négocié par un syndicat
+;;;;;;;;;;;3;Non-unionized;Non syndiqué
+;;;;;;;;;;;blank;Not applicable;Indisponible
+90;1;1997;;permtemp;Job permanency, employees only;La permanence de l'emploi, employés seulement;;;;;;;
+;;;;;;;;;;;1;Permanent;Permanents
+;;;;;;;;;;;2;Temporary, seasonal job;Temporaires, saisonniers
+;;;;;;;;;;;3;Temporary, term or contract job;Temporaires, à terme ou à contrat
+;;;;;;;;;;;4;Temporary, casual or other temorary jobs;Temporaires, occasionnels ou autres emplois temporaires
+;;;;;;;;;;;blank;Not applicable;Indisponible
+91;1;1997;;estsize;Establishment size;Taille de l’établissement;Employees only;Les employés seulement;;;;;
+;;;;;;;;;;;1;Less than 20 employees;Moins de 20 employés
+;;;;;;;;;;;2;20 to 99 employees;20 à 99 employés
+;;;;;;;;;;;3;100 to 500 employees;100 à 500 employés
+;;;;;;;;;;;4;More than 500 employees;Plus de 500 employés
+;;;;;;;;;;;blank;Not applicable;Indisponible
+92;1;1998;;firmsize;Firm size;Taille de l’entreprise;Includes those with single location;Comprend les entreprises n'opérant qu'à un seul endroit;Employees only;Les employés seulement;;;
+;;;;;;;;;;;1;Less than 20 employees;Moins de 20 employés
+;;;;;;;;;;;2;20 to 99 employees;20 à 99 employés
+;;;;;;;;;;;3;100 to 500 employees;100 à 500 employés
+;;;;;;;;;;;4;More than 500 employees;Plus de 500 employés
+;;;;;;;;;;;blank;Not applicable;Indisponible
+93;2;1976;;durunemp;Duration of unemployment (weeks);Durée du chômage (semaines);;;;;;;
+;;;;;;;;;;;janv-99;;
+;;;;;;;;;;;blank;Not applicable;Indisponible
+95;1;1976;;flowunem;Flows into unemployment;Flux d'entrée en chômage;;;;;;;
+;;;;;;;;;;;1;Job losers, temporary layoff;Ont perdu leur emploi, mise à pied temporaire
+;;;;;;;;;;;2;Job losers, permanent layoff;Ont perdu leur emploi, mise à pied permanente
+;;;;;;;;;;;3;Job leavers;Ont quitté leur emploi
+;;;;;;;;;;;4;Job leavers/losers (status unknown), worked more than 1 year ago ;Ont perdu/quitté leur emploi (statut inconnu), ont travaillé il y a plus d'un an
+;;;;;;;;;;;5;New entrants;Nouveaux entrants
+;;;;;;;;;;;6;Re-entrants, worked 1 year ago or less;Rentrants, ont travaillé il y a un an ou moins
+;;;;;;;;;;;7;Re-entrants, worked more than 1 year ago;Rentrants, ont travaillé il y a plus d'un an 
+;;;;;;;;;;;8;Future starts;Emploi devant commencer à une date future
+;;;;;;;;;;;blank;Not applicable;Indisponible
+96;1;1976;;unemftpt;Unemployed, type of job wanted;Chômeurs, genre de travail désiré;Not known for future starts;Inconnu pour emploi devant commencer à une date future;Status at last job if temporary layoff;Situation au dernier emploi si mise à pied temporaire;;;
+;;;;;;;;;;;1;Full-time;Temps plein
+;;;;;;;;;;;2;Part-time;Temps partiel
+;;;;;;;;;;;3;Future starts;Emploi devant commencer à une date future
+;;;;;;;;;;;blank;Not applicable;Indisponible
+97;1;1976;;whylefto;Reason for leaving job during previous year ;Raisons pour avoir quitté l'emploi durant l'année précédente;Links pre-and post redesign;Relie l'avant et l'après remaniement;;;;;
+;;;;;;;;;;;0;Job leavers, other reasons;Ont quitté leur emploi, autres raisons
+;;;;;;;;;;;1;Job leavers, own illness or disability;Ont quitté leur emploi, maladie ou incapacité
+;;;;;;;;;;;2;Job leavers, personal or family responsibilities;Ont quitté leur emploi, obligations personnelles ou familiales
+;;;;;;;;;;;3;Job leavers, going to school;Ont quitté leur emploi, vont à l'école
+;;;;;;;;;;;4;Job losers, laid off;Ont perdu leur emploi, mis à pied
+;;;;;;;;;;;5;Job leavers, retired;Ont quitté leur emploi, ont pris leur retraite
+;;;;;;;;;;;blank;Not applicable;Indisponible
+98;2;1997;;whyleftn;Reason for leaving job during previous year ;Raisons pour avoir quitté l'emploi durant l'année précédente;;;;;;;
+;;;;;;;;;;;0;Job leavers, other reasons;Ont quitté leur emploi, autres raisons
+;;;;;;;;;;;1;Job leavers, own illness or disability;Ont quitté leur emploi, maladie ou incapacité
+;;;;;;;;;;;2;Job leavers, caring for children;Ont quitté leur emploi, soins des enfants
+;;;;;;;;;;;3;Job leavers, pregnancy;Ont quitté leur emploi, sont enceintes
+;;;;;;;;;;;4;Job leavers, personal or family responsibilities;Ont quitté leur emploi, obligations personnelles ou familiales
+;;;;;;;;;;;5;Job leavers, going to school;Ont quitté leur emploi, vont à l'école
+;;;;;;;;;;;6;Job leavers, dissatisfied;Ont quitté leur emploi, insatisfaction
+;;;;;;;;;;;7;Job leavers, retired;Ont quitté leur emploi, ont pris leur retraite
+;;;;;;;;;;;8;Job leavers, business sold or closed down (self-employed);Ont quitté leur emploi, ont vendu ou fermé l'entreprise (travailleurs autonomes)
+;;;;;;;;;;;9;Job losers, end of seasonal job (employee);Ont perdu leur emploi, fin de l'emploi saisonnier (employés)
+;;;;;;;;;;;10;Job losers, end of temporary or casual (employee);Ont perdu leur emploi, fin de l'emploi temporaire ou occasionnel (employés)
+;;;;;;;;;;;11;Job losers, company moved or out of business (employee);Ont perdu leur emploi, l'entreprise a déménagé ou a fermé (employés)
+;;;;;;;;;;;12;Job losers, business conditions (employee);Ont perdu leur emploi, conjoncture économique (employés)
+;;;;;;;;;;;13;Job losers, dismissal or other reasons;Ont perdu leur emploi, congédiement ou autres raisons
+;;;;;;;;;;;blank;Not applicable;Indisponible
+100;3;1976;;durjless;Duration of joblessness (months);Durée de la période sans emploi (mois);Not currently employed and not in the labour force;Présentement non occupé et inactif;;;;;
+;;;;;;;;;;;1-240;;
+;;;;;;;;;;;blank;Not applicable;Indisponible
+103;1;1976;;availabl;Availability during the reference week;Disponibilité durant la semaine de référence;;;;;;;
+;;;;;;;;;;;1;Not available;Non disponible
+;;;;;;;;;;;2;Yes, available;Oui, disponible
+;;;;;;;;;;;blank;Not applicable;Indisponible
+104;1;1976;;lkpubag;Unemployed, used public employment agency;Chômeurs, recherche par l'entremise d'une agence de placement publique;;;;;;;
+;;;;;;;;;;;1;Yes;Oui
+;;;;;;;;;;;blank;Not applicable;Indisponible
+105;1;1976;;lkemploy;Unemployed, checked with employers directly;Chômeurs, recherche directement auprès des employeurs;;;;;;;
+;;;;;;;;;;;1;Yes;Oui
+;;;;;;;;;;;blank;Not applicable;Indisponible
+106;1;1976;;lkrels;Unemployed, checked with friends or relatives;Chômeurs, recherche auprès d'amis ou de parents;;;;;;;
+;;;;;;;;;;;1;Yes;Oui
+;;;;;;;;;;;blank;Not applicable;Indisponible
+107;1;1976;;lkatads;Unemployed, looked at job ads;Chômeurs, consultation des annonces d'offres d'emploi;;;;;;;
+;;;;;;;;;;;1;Yes;Oui
+;;;;;;;;;;;blank;Not applicable;Indisponible
+108;1;1976;;lkansads;Unemployed, placed or answered ads;Chômeurs, placement d'une annonce ou réponse à une offre d'emploi;;;;;;;
+;;;;;;;;;;;1;Yes;Oui
+;;;;;;;;;;;blank;Not applicable;Indisponible
+109;1;1976;;lkothern ;Unemployed, other methods;Chômeurs, autres méthodes;;;;;;;
+;;;;;;;;;;;1;Yes;Oui
+;;;;;;;;;;;blank;Not applicable;Indisponible
+110;1;1976;;prioract;Main activity before started looking for work;Activité principale avant de commencer à chercher du travail;Unemployed job searchers only;Chômeurs à la recherche d'un emploi seulement;;;;;
+;;;;;;;;;;;0;Other;Autre
+;;;;;;;;;;;1;Working;Travaillaient
+;;;;;;;;;;;2;Managing a home;Tenaient maison
+;;;;;;;;;;;3;Going to school;Allaient à l'école
+;;;;;;;;;;;blank;Not applicable;Indisponible
+112;1;1997;;ynolook;Reason for not looking for work during the reference week;Raisons pour ne pas chercher d'emploi durant la semaine de référence;;;;;;;
+;;;;;;;;;;;0;Wanted work, reason - other;Voulaient travailler, raison - autres
+;;;;;;;;;;;1;Wanted work, reason - own illness or disability;Voulaient travailler, raison - maladie ou incapacité
+;;;;;;;;;;;2;Wanted work, reason - caring for children;Voulaient travailler, raison - soins des enfants
+;;;;;;;;;;;3;Wanted work, reason - other personal or family responsibilities;Voulaient travailler, raison - autres obligations personnelles ou familiales
+;;;;;;;;;;;4;Wanted work, reason - school;Voulaient travailler, raison - école
+;;;;;;;;;;;5;Wanted work, reason - awaiting recall or reply;Voulaient travailler, raison - en attente d'un appel ou réponse
+;;;;;;;;;;;6;Wanted work, reason - discouraged;Voulaient travailler, raison - découragés
+;;;;;;;;;;;blank;Not applicable;Indisponible
+113;1;1976;;tlolook;Temporary layoff, looked for work during the last four weeks;Mise à pied temporaire, personnes qui avaient cherché du travail durant les quatre dernières semaines;;;;;;;
+;;;;;;;;;;;1;Yes;Oui
+;;;;;;;;;;;2;No;Non
+;;;;;;;;;;;blank;Not applicable;Indisponible
+114;1;2017;;schooln;Current student status;Statut d'étudiant actuel ;;;;;;;
+;;;;;;;;;;;1;Non-student;Non-étudiants
+;;;;;;;;;;;2;Full-time student;Étudiants à temps plein
+;;;;;;;;;;;3;Part-time student;Étudiants à temps partiel
+;;;;;;;;;;;blank;Not applicable;Indisponible
+116;2;1976;;efamtype;Type of economic family;Genre de famille économique;From viewpoint of reference person;Du point de vue de la personne de référence;;;;;
+;;;;;;;;;;;1;Person not in an economic family;Personne hors famille économique
+;;;;;;;;;;;2;Dual-earner couple, no children or none under 25;Famille comptant un couple avec deux soutiens, pas d’enfant ou aucun enfant de moins de 25 ans
+;;;;;;;;;;;3;Dual-earner couple, youngest child 0 to 17;Famille compant un couple avec deux soutiens, dont le plus jeune enfant a entre 0 et 17 ans
+;;;;;;;;;;;4;Dual-earner couple, youngest child 18 to 24;Famille compant un couple avec deux soutiens, dont le plus jeune enfant a entre 18 et 24 ans
+;;;;;;;;;;;5;Single-earner couple, male employed, no children or none under 25;Famille comptant un couple avec un homme comme soutien, pas d’enfant ou aucun enfant de moins de 25 ans
+;;;;;;;;;;;6;Single-earner couple, male employed, youngest child 0 to 17;Famille comptant un couple avec un homme comme soutien, dont le plus jeune enfant a entre 0 et 17 ans
+;;;;;;;;;;;7;Single-earner couple, male employed, youngest child 18 to 24;Famille comptant un couple avec un homme comme soutien, dont le plus jeune enfant a entre18 et 24 ans
+;;;;;;;;;;;8;Single-earner couple, female employed, no children or none under 25;Famille comptant un couple avec une femme comme soutien, pas d’enfant ou aucun enfant de moins de 25 ans
+;;;;;;;;;;;9;Single-earner couple, female employed, youngest child 0 to 17;Famille comptant un couple avec une femme comme soutien, dont le plus jeune enfant a entre 0 et 17 ans
+;;;;;;;;;;;10;Single-earner couple, female employed, youngest child 18 to 24;Famille comptant un couple avec une femme comme soutien, dont le plus jeune enfant a entre18 et 24 ans
+;;;;;;;;;;;11;Non-earner couple, no children or none under 25;Famille comptant un couple sans soutien, pas d’enfant ou aucun enfant de moins de 25 ans
+;;;;;;;;;;;12;Non-earner couple, youngest child 0 to 17;Famille comptant un couple sans soutien, dont le plus jeune enfant a entre 0 et 17 ans
+;;;;;;;;;;;13;Non-earner couple, youngest child 18 to 24;Famille comptant un couple sans soutien, dont le plus jeune enfant a entre 18 et 24 ans
+;;;;;;;;;;;14;Lone-parent family, parent employed, youngest child 0 to 17;Famille monoparentale, le parent travaille, dont le plus jeune enfant a entre 0 et 17 ans
+;;;;;;;;;;;15;Lone-parent family, parent employed, youngest child 18 to 24;Famille monoparentale, le parent travaille, dont le plus jeune enfant a entre 18 et 24 ans
+;;;;;;;;;;;16;Lone-parent family, parent not employed, youngest child 0 to 17;Famille monoparentale, le parent ne travaille pas, dont le plus jeune enfant a entre 0 et 17 ans
+;;;;;;;;;;;17;Lone-parent family, parent not employed, youngest child 18 to 24;Famille monoparentale, le parent ne travaille pas, dont le plus jeune enfant a entre 18 et 24 ans
+;;;;;;;;;;;18;Other families;Autres Familles
+132;1;2017;;agyownk;Age of youngest child;L’âge du plus jeune enfant;On parent(s) record only;Sur l'observation du ou des parents seulement;;;;;
+;;;;;;;;;;;1;Youngest child less than 6 years;Plus jeune enfant de moins de 6 ans
+;;;;;;;;;;;2;Youngest child 6 to 12 years;Plus jeune enfant de 6 à 12 ans
+;;;;;;;;;;;3;Youngest child 13 to 17 years;Plus jeune enfant de 13 à 17 ans
+;;;;;;;;;;;4;Youngest child 18 to 24 years;Plus jeune enfant de 18 à 24 ans
+;;;;;;;;;;;blank;Not applicable;Indisponible
+134;5;1976;;finalwt;Standard final weight;Le poids final standard;;;;;;;
+;;;;;;;;;;;1-99999;;
