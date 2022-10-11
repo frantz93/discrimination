@@ -1,6 +1,5 @@
 ---
-title: 'Discrimination sur le marché du travail : le cas des immigrants du Québec
-  au Québec'
+title: 'Discrimination sur le marché du travail : le cas des immigrants du Québec'
 subtitle: "Script pour la reproduction de l'analyse"
 author: "Frantz Roby POINT DU JOUR"
 date: "`r Sys.Date()`"
