@@ -1,18 +1,33 @@
 ---
-title: 'Discrimination sur le marché du travail : le cas des immigrants du Québec'
-subtitle: "Script pour la reproduction de l'analyse"
+title: 'Discrimination sur le marché du travail : le cas des immigrants du Québec
+  au Québec'
 author: "Frantz Roby POINT DU JOUR"
 date: "`r Sys.Date()`"
 output:
-  html_document:
+  bookdown::html_document2:
     toc: TRUE
-    number_sections: FALSE
-    fig_caption: true
+    number_sections: TRUE
+    fig_caption: TRUE
+#  html_document:
+#    toc: TRUE
+#    number_sections: TRUE
+#    fig_caption: true
+#  pdf_document: 
+#    toc: TRUE
+#    number_sections: TRUE
+#    fig_caption: true
+    #latex_engine: xelatex
+#  word_document:
+#    toc: TRUE
+#    number_sections: TRUE
+ #   fig_caption: true
 ---
 
 
-```{r setup, include=FALSE, echo=TRUE}
-knitr::opts_chunk$set(message=FALSE, warning=FALSE)
+```{r setup, include=FALSE}
+#Load required libraries and configure parameters
+
+knitr::opts_chunk$set(echo=FALSE, message=FALSE, warning=FALSE)
 options(digits = 8/2, scipen = 00)
 library(tidyverse)
 library(knitr)
@@ -30,10 +45,9 @@ set_flextable_defaults(fonts_ignore = TRUE, digits = 3)
 ```
 
 
-### Chargement de la base de données
-
 ```{r loadbase}
-# Chargement de la base de données
+#Load the database
+
 base <- read.csv("../base/pub0422.csv")
 db <- data.frame(ID = base$REC_NUM, SURVYEAR = base$SURVYEAR, SURVMNTH = base$SURVMNTH,
                     PROV = base$PROV, AGE = base$AGE_12, SEX = base$SEX, MARSTAT = base$MARSTAT,
@@ -45,10 +59,9 @@ db <- data.frame(ID = base$REC_NUM, SURVYEAR = base$SURVYEAR, SURVMNTH = base$SU
 ```
 
 
-### Transformation et description des variables de la base de données
+```{r transform}
+# Create and format variables
 
-```{r descripbase2}
-# Creation et formattage des variables
 attach(db)
 
 db$YOUNG <- factor(if_else(AGE < 3, 1, 0))
@@ -71,10 +84,16 @@ db$YRS.TENURE <- db$TENURE/12
 db$PROVINCE <- factor(PROV, labels = c("Terre-Neuve-et-Labrador", "Île-du-Prince-Édouard", "Nouvelle-Écosse", "Nouveau-Brunswick", 
                                          "Québec", "Ontario", "Manitoba", "Saskatchewan", "Alberta", "Colombie-Britannique"))
 db$LN.SAL <- log(db$SAL)
+```
 
-descrip <- data.frame(Variable=names(select(db,c(18:32))), 
+
+```{r}
+### Describe the variables that will be used in the model
+
+descrip <- data.frame(Variable=names(select(db,c("YOUNG","WOMAN","MARRIED","EDUC.LEVEL","IMMIGRANT","ISPAID","SELF.EMP","PART.TIME",
+                                                 "SYNDIC","LARGFIRM","ISUNEMP","LONG.UNEMP","OCCUP.SEC","HRLYEARN","DURUNEMP"))), 
                       Description=c("Catégorie d’âge de l’individu : (1) si âgé de moins de 30 ans ; (0) sinon.",
-                                    "Genre femme : (1) s’il s’agit d’une femme ; (0) pour les hommes.",
+                                    "Genre femme : (1) s’il s’agit d’une femme ; (0) pour un homme.",
                                     "Statut matrimonial : (1) si marié ; (0) sinon.",
                                     paste0("Niveau d’éducation : (0) faible [études secondaires ou moins] ; (1) moyen [études ",
                                            "post-secondaires inférieures au baccalauréat] ; (2) élevé [diplôme de baccalauréat ",
@@ -89,7 +108,7 @@ descrip <- data.frame(Variable=names(select(db,c(18:32))),
                                     paste0("Taille de l’entreprise employeuse : (1) pour les grandes firmes de plus de 500 employés",
                                            "; (0) pour les plus petites entreprises."),
                                     "(1) Si la personne est au chômage ; (0) sinon.",
-                                    "(1) Pour les personnes en recherche d’emploi depuis au moins 12 mois chômage long ; (0) sinon.",
+                                    "(1) Pour les personnes en recherche d’emploi depuis au moins 12 mois -> chômage long ; (0) sinon.",
                                     paste0("Catégories professionnelles selon le système de classification nationale : (1) Gestion ",
                                            "(2) Affaires, finance et administration (3) Sciences naturelles et appliquées et ",
                                            "domaines apparentés (4) Secteur de la santé (5) Enseignement, droit et services ",
@@ -100,26 +119,25 @@ descrip <- data.frame(Variable=names(select(db,c(18:32))),
                                     "Salaire horaire habituel (en dollar canadien)",
                                     "Durée de l'emploi avec l'employeur actuel (en années)"))
 
-kable(descrip, caption = "Description des variables", "simple")
-#descrip %>% regulartable() %>% autofit() %>% width(j=~Variable, width = 1) %>% width(j=~Description, width = 5.4) %>% set_caption("Description des variables") #for fitting PDF doc
+tab1 <- knitr::kable(descrip, caption = "Description des variables", "simple") #fit html
+#tab1
+#tab1 -< descrip %>% regulartable() %>% autofit() %>% width(j=~Variable, width = 1) %>% width(j=~Description, width = 5.4) %>% set_caption("Description des variables") #for fitting PDF doc
 ```
 
 
-# RÉSULTATS
+```{r extractdb}
+# Filter the database and extract data for Quebec Province
 
-```{r}
-# Extraction de la base de données du Québec
 baseQC <- db %>% filter(PROVINCE == "Québec") %>% select(c(20:34,36))
 ```
 
-## Analyse exploratoire
 
-### Statistiques descriptives
+```{r}
+# Descriptive statistics
 
-```{r statdesc}
-
-# Statistiques descriptives
 attach(baseQC)
+obs = count(baseQC) #nombre d'observations
+
 stat1 <- data.frame(variable = c("YOUNG","WOMAN","MARRIED","EDUC.LEVEL_0","EDUC.LEVEL_1","EDUC.LEVEL_2","IMMIGRANT","ISPAID","SELF.EMP","PART.TIME","SYNDIC","LARGFIRM","ISUNEMP","LONG.UNEMP"), n = c(sum(YOUNG=='1', na.rm=TRUE),sum(WOMAN=='1', na.rm=TRUE),sum(MARRIED=='1', na.rm=TRUE),sum(EDUC.LEVEL=='0', na.rm=TRUE),sum(EDUC.LEVEL=='1', na.rm=TRUE),sum(EDUC.LEVEL=='2', na.rm=TRUE),sum(IMMIGRANT=='1', na.rm=TRUE),sum(ISPAID=='1', na.rm=TRUE),sum(SELF.EMP=='1', na.rm=TRUE),sum(PART.TIME=='1', na.rm=TRUE),sum(SYNDIC=='1', na.rm=TRUE),sum(LARGFIRM=='1', na.rm=TRUE),sum(ISUNEMP=='1', na.rm=TRUE),sum(LONG.UNEMP=='1', na.rm=TRUE)), prop_n = c(mean(YOUNG=='1', na.rm=TRUE),mean(WOMAN=='1', na.rm=TRUE),mean(MARRIED=='1', na.rm=TRUE),mean(EDUC.LEVEL=='0', na.rm=TRUE),mean(EDUC.LEVEL=='1', na.rm=TRUE),mean(EDUC.LEVEL=='2', na.rm=TRUE),mean(IMMIGRANT=='1', na.rm=TRUE),mean(ISPAID=='1', na.rm=TRUE),mean(SELF.EMP=='1', na.rm=TRUE),mean(PART.TIME=='1', na.rm=TRUE),mean(SYNDIC=='1', na.rm=TRUE),mean(LARGFIRM=='1', na.rm=TRUE),mean(ISUNEMP=='1', na.rm=TRUE),mean(LONG.UNEMP=='1', na.rm=TRUE)))
 
 stat2 <- data.frame(variable = c("OCCUP.SEC1","OCCUP.SEC2","OCCUP.SEC3","OCCUP.SEC4","OCCUP.SEC5","OCCUP.SEC6","OCCUP.SEC7","OCCUP.SEC8","OCCUP.SEC9","OCCUP.SEC10"),
@@ -128,53 +146,61 @@ stat2 <- data.frame(variable = c("OCCUP.SEC1","OCCUP.SEC2","OCCUP.SEC3","OCCUP.S
 
 stat3 <- data.frame(variable = c("SAL","YRS.TENURE"), moy = c(mean(SAL, na.rm=TRUE), mean(YRS.TENURE, na.rm=TRUE)), ecart_type = c(sd(SAL, na.rm=TRUE), sd(YRS.TENURE, na.rm=TRUE)))
 
-kables(list(kable(stat1) %>% kable_styling(), list(kable(stat2) %>% kable_styling(), kable(stat3) %>% kable_styling())), caption = "Statistique descriptive") %>% kable_styling()
+tab2 <- knitr::kables(list(kable(stat1) %>% kable_styling(), list(kable(stat2) %>% kable_styling(), kable(stat3) %>% kable_styling())), caption = paste0("Statistique descriptive ", "(N = ", obs, ")")) %>% kable_styling()
 
-#kable(list(stat1, stat2, stat3), caption = 'Statistique descriptive', booktabs = TRUE, valign = 't')   #for fitting PDF doc
+#paste0("Taille de la BD = ", count(baseQC))
+#tab2 <- knitr::kable(list(stat1, stat2, stat3), caption = 'Statistique descriptive', booktabs = TRUE, valign = 't')   #for fitting PDF doc
+
+#tab2
 ```
 
 
-### Analyse en composantes multiples
+```{r acm1, out.width="75%", fig.align='center', fig.cap = "Représentation des variables quali. supp. dans le plan ACM"}
+#Multicomponent analysis - supplementary qualitative variables
 
-```{r acm1}
 varACM <- subset.data.frame(baseQC, 
                             select = c("WOMAN", "YOUNG", "MARRIED", "EDUC.LEVEL", "IMMIGRANT", "SELF.EMP", "SYNDIC", "OCCUP.SEC",
                                        "PART.TIME", "LARGFIRM", "ISPAID", "ISUNEMP", "LONG.UNEMP", "YRS.TENURE", "SAL"))
 res.mca <- MCA(varACM, quali.sup = c(6:13), quanti.sup = c(14, 15), graph = FALSE)
 
 p0 <- plot(res.mca, invisible = c("ind", "var"), habillage = "quali", cex = 0.9, selectMod = "cos2 20")
-#p0 + labs(title = "Position des variables quali. supp. dans le plan ACM", caption = "©FRPDJ, Source:StatCan-04/2022") + 
-#  theme(plot.title = element_text(size = 18)) #french version
-p0 <- p0 + labs(title = "Showing the supp. quali. variables in the  MCA plan", caption = "©FRPDJ, Source:StatCan-04/2022") + 
-  theme(plot.title = element_text(size = 12)) #english version
-p0
+p0 <- p0 + labs(caption = "©FRPDJ, Source:StatCan-04/2022") + 
+  theme(plot.title = element_text(size = 12)) #french version
+#p0 <- p0 + labs(title = "Showing the supp. quali. variables in the  MCA plan", caption = "©FRPDJ, Source:StatCan-04/2022") + 
+#  theme(plot.title = element_text(size = 12)) #english version
+#p0
 ```
 
-```{r acm2}
+```{r acm2, out.width="75%", fig.align='center', fig.cap = "Représentation des principales variables dans le plan ACM"}
+#Multicomponent analysis - main variables
+
 p1 <- plot(res.mca, invisible = c("ind", "quali.sup"), habillage = "quali", cex = 0.9, selectMod = "cos2 20")
-#p1 + labs(title = "Position des variables fondamentales dans le plan ACM", caption = "©FRPDJ, Source:StatCan-04/2022") #french version
-p1 <- p1 + labs(title = "Showing the main variables in the MCA plan", caption = "©FRPDJ, Source:StatCan-04/2022") + theme(plot.title = element_text(size = 12))
+p1 <- p1 + labs(caption = "©FRPDJ, Source:StatCan-04/2022") + theme(plot.title = element_text(size = 12)) #french version
+#p1 <- p1 + labs(title = "Showing the main variables in the MCA plan", caption = "©FRPDJ, Source:StatCan-04/2022") + theme(plot.title = element_text(size = 12))
 #english version
-p1
+#p1
 ```
 
-
-### Analyse comparative : immigrants vs natifs
 
 ```{r setdata1}
+#Compare mean salary between immigrants and canadian born citizens - ttest
+
 mean_nat <- round(mean(baseQC$SAL[IMMIGRANT==0], na.rm = TRUE), 1)
 mean_im <- round(mean(baseQC$SAL[IMMIGRANT==1], na.rm = TRUE), 1)
 med_nat <- round(median(baseQC$SAL[IMMIGRANT==0], na.rm = TRUE), 1)
 med_im <- round(median(baseQC$SAL[IMMIGRANT==1], na.rm = TRUE), 1)
-tmoy <- t.test(baseQC$SAL ~ baseQC$IMMIGRANT)
+tmoy <- t.test(baseQC$SAL ~ baseQC$IMMIGRANT)  #test de moyenne de salaire entre immigrants et natifs
+tmoy_pvalue <- round(tmoy$p.value, 4) #p-value du test de moyenne
 ```
 
 
-```{r acomp1, fig.show="hold", out.width="50%"}
+```{r acomp1, fig.show="hold", out.width="50%", fig.align='center', fig.cap = "Distribution du salaire horaire immigrants vs natifs (boîtes à moustaches et courbes de densité"}
+#Compare salary distribution in immigrants and canadian born citizens population sample
+
 p2 <- baseQC %>% filter(!is.na(SAL) & !is.na(IMMIGRANT)) %>% group_by(IMMIGRANT) %>% ggplot(aes(IMMIGRANT,SAL, fill = IMMIGRANT))
 p2 <- p2 + geom_boxplot() + 
-  #labs(title = "Distribution des salaires (boîtes à moustaches)", caption = "©FRPDJ, Source:StatCan") + #french version
-  labs(title = "Hourly wage distribution in Quebec (boxplot)", caption = "©FRPDJ, Source:StatCan") + #english version
+  labs(subtitle = "A- boîtes à moustaches", caption = "©FRPDJ, Source:StatCan") + #french version
+  #labs(title = "Hourly wage distribution in Quebec (boxplot)", caption = "©FRPDJ, Source:StatCan") + #english version
   theme_fivethirtyeight() + 
   theme(legend.position="none", axis.text = element_text(size = 12)) + 
   scale_x_discrete(name="", labels=c("Canadian born", "Immigrant")) + 
@@ -182,25 +208,23 @@ p2 <- p2 + geom_boxplot() +
   geom_text(aes(x=0.51, y=mean_nat+2, label="mean CB", col="c")) + 
   geom_hline(yintercept = mean_im, col = "blue") + 
   geom_text(aes(x=2.5, y=mean_im-2, label="mean IM", col="i"))
-p2
+#p2
 
 p3 <- baseQC %>% filter(!is.na(SAL) & !is.na(IMMIGRANT)) %>% group_by(IMMIGRANT) %>% ggplot(aes(SAL, fill = IMMIGRANT))
 p3 <- p3 + geom_density(alpha=0.2, bw=2, position = "nudge") + 
   scale_fill_discrete(name = "", labels = c("Canadian born", "Immigrant")) + 
-  #labs(title = "Distribution des salaires (courbes de densité)", caption = "©FRPDJ, Source:StatCan-04/2022") + #french version 
-  labs(title = "Hourly wage density curve in Quebec", caption = "©FRPDJ, Source:StatCan-04/2022") + #english version
+  labs(subtitle = "B- courbes de densité", caption = "©FRPDJ, Source:StatCan-04/2022") + #french version 
+  #labs(title = "Hourly wage density curve in Quebec", caption = "©FRPDJ, Source:StatCan-04/2022") + #english version
   theme_fivethirtyeight() + 
   theme(axis.text = element_text(size = 12), legend.text =  element_text(size = 12)) + 
   scale_x_continuous(breaks = c(0,9,14,30,52,65,92))
-p3
-
+#p3
 ```
 
-```{r testmoy}
-print(paste("ttest : p-value = ", round(tmoy$p.value, 4)))
-```
 
 ```{r setdata2}
+#Compare unemployment rate between immigrants and canadian born citizens
+
 chom <- baseQC %>% group_by(IMMIGRANT, ISUNEMP) %>% summarise(n = n()) %>% group_by(IMMIGRANT) %>% summarise(ISUNEMP = ISUNEMP, n = n, prop = n/sum(n)) %>% filter(ISUNEMP==1)
 
 rc_nat <- chom %>% filter(IMMIGRANT==0) %>% .$prop %>% percent(0.1)
@@ -218,29 +242,27 @@ x2_lchom_p <- round(x2_lchom$p.value, 4)
 ```
 
 
-```{r acomp2, out.width="50%"}
+```{r acomp2, out.width="50%", fig.align='center', fig.cap = "Comparaison des taux de chômage observés (immigrants vs natifs)"}
+#Compare unemployment rate between immigrants and canadian born citizens - figure
+
 p4 <- chom %>% ggplot()
 p4 <- p4 + geom_bar(data = chom, aes(IMMIGRANT, prop, fill = "UNEMP"), stat = "identity", width = 0.5) + 
   geom_bar(data = lchom, aes(IMMIGRANT, prop, fill = "LONG UNEMP"), col = "gray", stat = "identity", width = 0.5) + 
   scale_fill_manual(name='', breaks=c('UNEMP', 'LONG UNEMP'), values=c('UNEMP'='#E69F00', 'LONG UNEMP'='#D55E00')) +
-  #labs(title = "Proportion d'individus au chômage", caption = "©FRPDJ, Source:StatCan-04/2022") + #french version
-  labs(title = "Proportion of unemployment by group", caption = "©FRPDJ, Source:StatCan-04/2022") + #english version
+  labs(caption = paste("UNEMP chi2 (α=", x2_chom_p,"); LONG UNEMP chi2 (α=", x2_lchom_p,
+                       ")\n\n©FRPDJ, Source:StatCan-04/2022")) + #french version
+  #labs(title = "Proportion of unemployment by group", caption = "©FRPDJ, Source:StatCan-04/2022") + #english version
   theme_fivethirtyeight() +
   theme(axis.text = element_text(size = 12), legend.text =  element_text(size = 12)) + 
   scale_x_discrete(name="", labels=c("Canadian born", "Immigrant"))
-p4
+#p4
 ```
 
-```{r chi2test, out.width="50%"}
-print(paste("UNEMP: chi2 test p-value = ", x2_chom_p))
-print(paste("LONG UNEMP: chi2 test p-value = ", x2_lchom_p))
-```
 
-## Mesure de la discrimination salariale
 
-### Estimations par régression linéaire
+```{r ols}
+#OLS regression of the salary
 
-```{r reg1, fig.show="hold", out.width="50%"}
 baseQC.paid <- baseQC %>% filter(ISPAID == 1)  #Filtrage des donnees des salariés au Quebec
 
 reg1 <- lm(LN.SAL ~ YOUNG + WOMAN + MARRIED + EDUC.LEVEL + IMMIGRANT + 
@@ -273,8 +295,11 @@ occup <- tot[7:15,] %>% mutate(label = c("S1: Management", "S2: BAF",
 
 # Coefficients estimés pour les autres variables
 other <- tot[c(1:3,6,16:19),] %>% mutate(variable = reorder(variable, estim_coef, FUN = median))
+```
 
-# Graphique des coefficients estimés pour les autres variables
+```{r olsGraph1, fig.show="hold", out.width="60%", fig.align='center', fig.cap="Impact des caractéristiques individuelles sur le salaire horaire"}
+#OLS regression of the salary - estimated parameters - graph1
+
 p5 <- other %>% ggplot()
 p5 <- p5 + geom_point(aes(x = variable, y = estim_coef), size = 2, col = "darkblue") + 
   geom_text(aes(x = variable, y = estim_coef, label=sign), nudge_x = .2, nudge_y = 0) + 
@@ -286,16 +311,18 @@ p5 <- p5 + geom_point(aes(x = variable, y = estim_coef), size = 2, col = "darkbl
         axis.text.y = element_text(size = 12)) + 
   labs(#title = "Structure des salaires au Quebec", #french version
        #subtitle = "\n Croissance des salaires vs caractéristiques individuelles \n", #french version
-       title = "The wage structure in Quebec",
-       subtitle = "\n Impact of individual caracteristics on wage growth \n", 
+       #title = "The wage structure in Quebec",
+       #subtitle = "\n Impact of individual caracteristics on wage growth \n", 
        caption = paste0("(*): p-value < 0.001 \n", 
                         "N=", sumreg1$df[2]+sumreg1$df[3], "; df=", sumreg1$df[2], 
                         "; R^2=", round(sumreg1$r.squared,2), 
                         "\n \n ©FRPDJ, Source: StatCan_EPA-04/22"))
-p5
+#p5
+```
 
+```{r olsGraph2, fig.show="hold", out.width="60%", fig.align='center', fig.cap="Impact de l'éducation sur le salaire horaire (réf. Niveau d’éducation secondaire ou inférieur"}
+#OLS regression of the salary - estimated parameters - graph2
 
-# Graphique des coefficients estimés pour les niveaux d'éducation
 p6 <- educ %>% ggplot()
 p6 <- p6 + geom_point(aes(x = variable, y = estim_coef), size = 2, col = "darkblue") + 
   geom_text(aes(x = variable, y = estim_coef, label=sign), nudge_x = .2, nudge_y = 0) + 
@@ -313,18 +340,18 @@ p6 <- p6 + geom_point(aes(x = variable, y = estim_coef), size = 2, col = "darkbl
   scale_y_continuous(name="Ln(wage) OLS estimates") + scale_color_discrete(name="") + 
   labs(#title = "Structure des salaires au Quebec : croissance des salaires vs niveau d'éducation", #french version
        #subtitle = "\n Niveau de référence : travailleurs avec éducation secondaire ou inférieure \n", #french version
-       title = "Wage structure in Quebec: impact of education on wage growth", 
-       subtitle = 'Reference: Workers with Secondary education or below', 
+       #title = "Wage structure in Quebec: impact of education on wage growth", 
+       #subtitle = 'Reference: Workers with Secondary education or below', 
        caption = paste0("(*): p-value < 0.001 \n", 
                         "N=", sumreg1$df[2]+sumreg1$df[3], "; df=", sumreg1$df[2], 
                         "; R^2=", round(sumreg1$r.squared,2), 
                         "\n \n ©FRPDJ, Source: StatCan_EPA-04/22"))
-p6
+#p6
 ```
 
-```{r reg1_suite}
+```{r olsGraph3, fig.show="hold", out.width="60%", fig.align='center', fig.cap="Impact du secteur d'activité sur le salaire horaire (réf. Secteur des ventes et services"}
+#OLS regression of the salary - estimated parameters - graph3
 
-# Graphique des coefficients estimés pour les secteurs d'activité
 p7 <- occup %>% ggplot()
 p7 <- p7 + geom_point(aes(x = variable, y = estim_coef), size = 2, col = "darkblue") + 
   geom_text(aes(x = variable, y = estim_coef, label=sign), nudge_x = .2, nudge_y = 0) + 
@@ -341,29 +368,31 @@ p7 <- p7 + geom_point(aes(x = variable, y = estim_coef), size = 2, col = "darkbl
         panel.background = element_rect(fill = "white")) + 
   labs(#title = "Structure des salaires au Quebec : comparaison des secteurs d'activités", #french version
        #subtitle = "\n Niveau de référence : secteur des ventes et services \n", #french version
-       title = "Wage structure in Quebec: comparing employment sectors", 
-       subtitle = 'Reference level is the sector of Sales and services', 
+       #title = "Wage structure in Quebec: comparing employment sectors", 
+       #subtitle = 'Reference level is the sector of Sales and services', 
        caption = paste0("(*): p-value < 0.001 \n", 
                         "N=", sumreg1$df[2]+sumreg1$df[3], "; df=", sumreg1$df[2], 
                         "; R^2=", round(sumreg1$r.squared,2), 
                         "\n \n ©FRPDJ, Source: StatCan_EPA-04/22"))
-p7
+#p7
 ```
 
-```{r reg1_tab}
-# Tableau de l'ensemble des résultats de la régression 
-kable(tot[,], caption = "Impact des variables sur le salaire horaire", "simple")
+
+```{r olsTab}
+#OLS regression of the salary - estimated parameters - table
+
+tab3 <- tot[,] %>% flextable() %>% set_caption("Résultats de la regression OLS du logarithme du salaire horaire") %>% colformat_double(digits = 4)
+#tab3
+#tab3 <- knitr::kable(tot[,], caption = "Impact des variables sur le salaire horaire", "simple")
 #tot <- tot %>% mutate(estim_coef=round(estim_coef,3), inf=round(inf,3), sup=round(sup,3),
 #               p_value=round(p_value,4))
 #tot %>% regulartable() %>% autofit() %>% set_caption("Impact des variables sur le salaire horaire") #for fitting PDF doc
-#kable(tot, caption = 'Impact des variables sur le salaire horaire', booktabs = TRUE, valign = 't')   #for fitting PDF doc
-
+#knitr::kable(tot, caption = 'Impact des variables sur le salaire horaire', booktabs = TRUE, valign = 't')   #for fitting PDF doc
 ```
 
 
-### Décomposition de l'écart de salaire (immigrants vs natifs)
-
-```{r reg_oaxaca}
+```{r oaxaca}
+#Decompose the salary gap between immigrants and canadian born citizen - Oaxaca regression
 baseQC.paid$T.IMMIG <- with(baseQC.paid, IMMIGRANT == 1)    #Variables de type 'logical'
 
 results <- oaxaca(formula = SAL ~ YOUNG + WOMAN + MARRIED + EDUC.LEVEL + 
@@ -371,13 +400,11 @@ results <- oaxaca(formula = SAL ~ YOUNG + WOMAN + MARRIED + EDUC.LEVEL +
                   data = baseQC.paid, R = 100)
 ```
 
+```{r ecartSal}
+#Oaxaca decomposition results
 
-```{r ecart_decomp1}
-#Decomposition de l'inégalité salariale (méthode Oaxaca)
-
-#résultat de la décomposition
-tab <- data.frame()
-tab <- data.frame(n = c(paste("A",results$n$n.A,sep = "\n"), 
+oaxacaResume <- data.frame()
+oaxacaResume <- data.frame(n = c(paste("A",results$n$n.A,sep = "\n"), 
                         paste("B",results$n$n.B, sep = "\n"), 
                         paste("pooled",results$n$n.pooled, sep = "\n")), 
                   y = c(paste("A",round(results$y$y.A, 2), sep = "\n"), 
@@ -389,8 +416,10 @@ tab <- data.frame(n = c(paste("A",results$n$n.A,sep = "\n"),
                   threefold = c(paste("endowments", round(results$threefold$overall[1], 2), sep = "\n"), 
                                 paste("coefficients", round(results$threefold$overall[3], 2), sep = "\n"), 
                                 paste("interaction", round(results$threefold$overall[5], 2), sep = "\n")))
+```
 
-#graphique illutrant la discrimination
+```{r EcartSalgraph, out.width="60%", fig.align='center', fig.cap="Décomposition de l'écart salarial entre natifs et immigrants"}
+#Oaxaca decomposition results - graph
 
 discrim <- data.frame(gap_type = c("Observed", "Expected", "Unexplained"), 
                       value = c(results$y$y.diff, results$twofold$overall[2,2], results$twofold$overall[2,4]))
@@ -406,39 +435,39 @@ p8 <- discrim %>% ggplot(aes(gap_type, value, fill = c("col1", "col2", "col3")))
     coord_flip() +
     labs(#title = "Structure des salaires au Quebec", #french version
          #subtitle = "\n Décomposition de l'écart salarial natifs (A) vs immigrants (B) \n", #french version
-         title = "The wage structure in Quebec", 
-         subtitle = 'Decomposing the wage gap between Canadian born citizens (A) and Immigrants (B)', 
+         #title = "The wage structure in Quebec", 
+         #subtitle = 'Decomposing the wage gap between Canadian born citizens (A) and Immigrants (B)', 
          caption = "Method: Blinder-Oaxaca \n \n ©FRPDJ, Source: StatCan_EPA-04/22")
-p8
-
-# Tableau détaillé du résultat de la décomposition de l'écart salarial
-kable(tab, caption = "Wage decomposition between Canadian born (A) and Immigrant (B)", "simple")
-#tab %>% flextable() %>% set_caption("Wage decomposition between Canadian born (A) and Immigrant (B)") #for fitting PDF doc
-
+#p8
 ```
 
-```{r ecart_endow}
+```{r ecartSalTab}
+#Oaxaca decomposition results - table
+
+tab4 <- oaxacaResume %>% flextable() %>% set_caption("Décomposition de l'écart salarial entre natifs (A) et immigrants (B)")
+#tab4
+#oaxacaResume %>% flextable() %>% set_caption("Wage decomposition between Canadian born (A) and Immigrant (B)") #for fitting PDF doc
+```
+
+```{r ecartSalEndow, out.width="70%", fig.align='center', fig.cap="Impact des différences de caractéristiques entre natifs et immigrants sur l'écart salarial"}
 #graphe de la formation des ecarts expliqués par les différences de caractéristiques
-p9 <- plot(results, components = c("endowments")) + ggtitle("Impact of workers' characteristics on wage gap")
-p9
+
+p9 <- plot(results, components = c("endowments")) #+ ggtitle("Impact of workers' characteristics on wage gap")
+#p9
 ```
 
-```{r ecart_expl}
+```{r ecartSalExpl,  out.width="70%", fig.align='center', fig.cap="Impact des interactions ajoutées aux différences de caractéristiques sur l'écart salarial (natifs vs immigrants)"}
 #graphe de la formation des ecarts expliqués par le modèle
-p10 <- plot(results, decomposition = "twofold", group.weight = 1, components = c("explained"), 
-     title = "Impact of workers' characteristics and interactions on wage gap") 
-p10
+
+p10 <- plot(results, decomposition = "twofold", group.weight = 1, components = c("explained")) + ggtitle("Impact of workers' characteristics and interactions on wage gap") 
+#p10
 #round(results$twofold$variables[[2]][,2:3],3)   #coefficients de la formation des ecarts expliqués par le modèle
 ```
 
 
-## Mesure de la discrimination dans l'accès à l'emploi
-
-### Estimations par régression logistique
-
 ```{r logit}
+# Logistic Regression of the unemployment 
 
-# Regression Logit - Chomage
 reg2 <- glm(ISUNEMP ~ YOUNG + WOMAN + MARRIED + EDUC.LEVEL + IMMIGRANT + SELF.EMP, family = binomial(link = "logit"), baseQC)
 
 sumreg2 <- summary(reg2)
@@ -451,7 +480,10 @@ tot2 <- data.frame(estim_coef = sumreg2$coefficients[ , 1], inf = conf2$b_inf,
   mutate(variable = c("intercept", "YOUNG", "WOMAN", "MARRIED", "EDUC.LEVEL_1","EDUC.LEVEL_2", "IMMIGRANT", "SELF.EMP"), .before = 1) %>%
   filter(variable != "intercept") %>%
   mutate(variable = reorder(variable, estim_coef, FUN = median))
+```
 
+```{r logitGraph, out.width="60%", fig.align='center', fig.cap="Influence des caractéristiques individuelles sur la probabilité d'être au chômage"}
+#Logistic Regression of the unemployment - graph
 
 p11 <- tot2 %>% ggplot()
 p11 <- p11 + geom_point(aes(x = variable, y = estim_coef), size = 2, col = "darkblue") + 
@@ -468,25 +500,28 @@ p11 <- p11 + geom_point(aes(x = variable, y = estim_coef), size = 2, col = "dark
                         "N=", sumreg2$df[2]+sumreg2$df[3], "; df=", sumreg2$df[2], 
                         "; AIC=", round(sumreg2$aic), 
                         "\n \n ©FRPDJ, Source: StatCan_EPA-04/22"))
-p11
-
+#p11
 ```
 
 
-```{r reg2_tab}
+```{r logitTab}
 tot2 <- tot2 %>% mutate(odds = exp(estim_coef))
+#Logistic Regression of the unemployment - table
 
-# Tableau de l'ensemble des résultats de la régression 
-kable(tot2[,], caption = "Impact des variables sur la probabilité d'être au chômage", "simple")
+# Tableau de l'ensemble des résultats de la régression
+tab5 <- tot2[,] %>% flextable() %>% set_caption("Influence des caractéristiques individuelles sur le risque d'être au chômage") %>% colformat_double(digits = 4) %>% flextable::footnote(i=1, j=6, ref_symbols = "a", part = "header", value = as_paragraph("(***) : p-val. < 0.001 ; (**) : p-val. < 0.01; (*) : p-val. < 0.05; (.) : p-val. < 0.1"))
+#tab5
+
+#knitr::kable(tot2[,], caption = "Influence des caractéristiques individuelles sur le risque d'être au #chômage", "simple")
 #tot2 %>% regulartable() %>% autofit() %>% set_caption("Impact des variables sur la probabilité d'être au chômage") #for fitting PDF doc
 ```
 
-### Décomposition de l'écart de probabilité de chômage
 
-```{r diff_carac}
+
+```{r fairlie}
 #Decomposition de l'écart (natif - immigrant) de prob chomage (methode Fairlie)
+#1.1-Vérification des différences de caractéristiques des natifs (A) vs les immigrants (B)
 
-# 1- Vérification des différences de caractéristiques des natifs (A) vs les immigrants (B)
 X.B <- model.matrix(~ ISUNEMP + YOUNG + WOMAN + MARRIED + EDUC.LEVEL + SELF.EMP, data = baseQC[baseQC$IMMIGRANT == "1",])
 X.A <- model.matrix(~ ISUNEMP + YOUNG + WOMAN + MARRIED + EDUC.LEVEL + SELF.EMP, data = baseQC[baseQC$IMMIGRANT == "0",])
 
@@ -496,14 +531,22 @@ ecartAB <- prop.A - prop.B        #ecart de caracteristiques entre les groupes (
 
 tot3 <- as_tibble(cbind(prop.A, prop.B, ecartAB))
 tot3 <- tot3 %>% mutate(variable=c("INTERCEPT","ISUNEMP","YOUNG","WOMAN","MARRIED","EDUC.LEVEL_1","EDUC.LEVEL_2", "SELF.EMP"), .before=1)
+```
 
-# Tableau de l'ensemble des résultats de la régression 
-kable(tot3[-1,], caption = "Différences de caractéristiques entre natifs (A) et immigrants (B)", "simple")
+```{r fairlieTab}
+#Decomposition de l'écart (natif - immigrant) de prob chomage (methode Fairlie)
+#1.2Tableau de l'ensemble des résultats de la régression 
+
+tab6 <- tot3[-1,] %>% flextable() %>% set_caption("Différences de caractéristiques entre natifs (A) et immigrants (B)") %>% colformat_double(digits = 4)
+#tab6
+
+#tab6 <- knitr::kable(tot3[-1,], caption = "Différences de caractéristiques entre natifs (A) et immigrants #(B)", "simple")
 #tot3[-1,] %>% regulartable() %>% autofit() %>% set_caption("Différences de caractéristiques entre natifs (A) et immigrants (B)") #for fitting PDF doc
 ```
 
-```{r ecart_decomp2}
+```{r ecartChom}
 # 2- Regression logit dans le groupe des natifs (groupe A)
+
 reg4 <- glm(ISUNEMP ~ YOUNG + WOMAN + MARRIED + EDUC.LEVEL + SELF.EMP, family = binomial(link = "logit"),
             data=baseQC[baseQC$IMMIGRANT == "0",])
 
@@ -518,8 +561,11 @@ inexpl <- prop.cB - tot3$prop.B[2] #Ecart inexpliqué
 
 # Construction du tableau de résultats
 tot4 <- data.frame(gap_type=c("Observed", "Expected", "Unexplained"), value=c(ecartAB[2], expl, inexpl))
+```
 
-# Graphique des résultats
+```{r ecartChomGraph, fig.cap="Décomposition de l'écart de probabilité de chômage entre natifs et immigrants"}
+#Decompose the unemployment rate gap betwenn immigrants and canadian born citizens - graph
+
 p12 <- tot4 %>% ggplot(aes(gap_type, value, fill = c("col1", "col2", "col3"))) + 
     geom_col(width = .95, position = "dodge") + 
     scale_fill_manual(values = c("col1"="#CC79A7","col2"="#009E73","col3"="#D55E00")) + 
@@ -531,30 +577,41 @@ p12 <- tot4 %>% ggplot(aes(gap_type, value, fill = c("col1", "col2", "col3"))) +
     coord_flip() +
     labs(#title = "Décomposition de l'écart de probabilité de chômage au Québec", #french version
          #subtitle = "\n Natifs (A) vs immigrants (B) \n", #french version
-         title = "Unemployment rate in Quebec", 
-         subtitle = 'Decomposing the gap between Canadian born citizens (A) and Immigrants (B)', 
+         #title = "Unemployment rate in Quebec", 
+         #subtitle = 'Decomposing the gap between Canadian born citizens (A) and Immigrants (B)', 
          caption = "Method: Blinder-Oaxaca \n \n ©FRPDJ, Source: StatCan_EPA-04/22")
-p12
+#p12
+```
 
-# Tableau détaillé du résultat de la décomposition de l'écart de probabilité de chômage
-kable(tot4, caption = "The unemployment rate gap: Canadian born (A) vs Immigrant (B)", "simple")
+```{r ecartChomTab}
+#Decompose the unemployment rate gap betwenn immigrants and canadian born citizens - table1
+
+tab7 <- tot4 %>% flextable() %>% set_caption("Décomposition de l'écart de probabilité de chômage entre natifs et immigrants") %>% colformat_double(digits = 4)
+#tab7
+
+#tab7 <- knitr::kable(tot4, caption = "Décomposition de l'écart de probabilité de chômage entre natifs et #immigrants",
+      #caption = "The unemployment rate gap: Canadian born (A) vs Immigrant (B)", 
+      #"simple")
 #tot4 %>% flextable() %>% set_caption("The unemployment rate gap: Canadian born (A) vs Immigrant (B)") #for fitting PDF
 
 ```
 
-```{r reg2}
+```{r ecartChomTab2}
 tot5 <- cbind(tot3[-c(1:2),], estim_coef=tot2[-6,]$estim_coef, p_value=tot2[-6,]$p_value, 
               sign=tot2[-6,]$sign)
+#Decompose the unemployment rate gap betwenn immigrants and canadian born citizens - table2
 
-# Tableau de l'ensemble des résultats de la régression 
-kable(tot5[,], caption = "Influence des caractéristiques individuelles (natifs(A) vs immigrants(B)) sur les probabilités de chômage", "simple")
-#tot5 %>% regulartable() %>% autofit() %>% set_caption("Influence des caractéristiques individuelles (natifs(A) vs immigrants(B)) sur les probabilités de chômage") #for fitting PDF doc
+tab8 <- tot5[,] %>% flextable() %>% set_caption("Influence des caractéristiques individuelles (natifs(A) vs immigrants(B)) sur les probabilités de chômage") %>% colformat_double(digits = 4) %>% flextable::footnote(i=1, j=7, ref_symbols = "a", part = "header", value = as_paragraph("(***) : p-val. < 0.001 ; (**) : p-val. < 0.01; (.) : p-val. < 0.1"))
+#tab8
+
+#tab8 <- kable(tot5[,], caption = "Influence des caractéristiques individuelles (natifs(A) vs immigrants(B)) #sur les probabilités de chômage", "simple")
+#tot5 %>% regulartable() %>% autofit() %>% set_caption("Influence des caractéristiques individuelles #(natifs(A) vs immigrants(B)) sur les probabilités de chômage") #for fitting PDF doc
 ```
 
-### Comparaison entre les provinces
 
-```{r reg_oaxaca_all}
-#discrimination salariale
+```{r regOaxacaAllSal}
+#Salary discrimination - Comparing different canadian provinces
+
 base.paid <- db %>% filter(ISPAID == 1)
 base.paid$T.IMMIG <- with(base.paid, IMMIGRANT == 1)    #Variables de type 'logical'
 
@@ -571,9 +628,10 @@ resultsMB <- oaxaca(formula = SAL ~ YOUNG + WOMAN + MARRIED + EDUC.LEVEL +
 resultsON <- oaxaca(formula = SAL ~ YOUNG + WOMAN + MARRIED + EDUC.LEVEL + 
                     OCCUP.SEC + PART.TIME + YRS.TENURE + SYNDIC + LARGFIRM | T.IMMIG, 
                   data = baseON.paid, R = 100)
+```
 
-
-#discrimination dans l'accès emploi
+```{r regOaxacaAllChom}
+#Employment access discrimination - Comparing different canadian provinces
 baseBC <- db %>% filter(PROV==59)
 baseMB <- db %>% filter(PROV==46)
 baseON <- db %>% filter(PROV==35)
@@ -631,14 +689,18 @@ expl_ON <- prop.A_ON[2] - prop.cB_ON
 inexpl_BC <- prop.cB_BC - prop.B_BC[2]
 inexpl_MB <- prop.cB_MB - prop.B_MB[2]
 inexpl_ON <- prop.cB_ON - prop.B_ON[2]
+```
 
-
+```{r regOaxacaAll}
+#Salary and Employment access discrimination - Comparing different canadian provinces
 tab_all <- data.frame(PROV = c("QC","BC","MB","ON"), 
                       UNEXP_SAL = c(results$twofold$overall[2,4], resultsBC$twofold$overall[2,4],
                                 resultsMB$twofold$overall[2,4], resultsON$twofold$overall[2,4]),
                       UNEXP_pCHOM = c(inexpl, inexpl_BC,inexpl_MB, inexpl_ON) )
+```
 
-# Graphs
+```{r regOaxacaAllGraph, out.width="60%", fig.align='center', fig.cap="Discrimination entre natifs et immigrants sur le marché du travail au Canada : comparaison entre provinces"}
+#Salary and Employment access discrimination - Comparing different canadian provinces - graph
 p13 <- tab_all %>% ggplot(aes(UNEXP_pCHOM, UNEXP_SAL, label=PROV)) + geom_point(size=4, aes(col=PROV)) +
   ggrepel::geom_text_repel(aes(col=PROV)) +
   geom_vline(xintercept = 0) + geom_hline(yintercept = 0) + 
@@ -646,13 +708,32 @@ p13 <- tab_all %>% ggplot(aes(UNEXP_pCHOM, UNEXP_SAL, label=PROV)) + geom_point(
   scale_y_continuous(limits = c(0, 6)) + 
   theme_economist_white() + 
   theme(legend.position = "none", axis.text = element_text(size = 12), legend.text =  element_text(size = 12))+
-  labs(title = "Labor market discrimination toward immigrants in Canada", 
-       subtitle="\nComparing Quebec to other Provinces\n", 
+  labs(#title = "Labor market discrimination toward immigrants in Canada", 
+       #subtitle="\nComparing Quebec to other Provinces\n", 
        caption = "©FRPDJ, Source:StatCan-04/2022") + geom_mark_circle(aes(filter=PROV!=c("MB","ON")),
                                                                                fill="lightblue")
-p13
+#p13
+```
 
-# Tableau des résultats
-kable(tab_all, caption = "Discrimination entre natifs et immigrants sur le marché du travail au Canada : comparaison entre provinces", "simple")
+```{r regOaxacaAllTab}
+#Salary and Employment access discrimination - Comparing different canadian provinces - table
+
+tab9 <- tab_all %>% flextable() %>% set_caption("Discrimination entre natifs et immigrants sur le marché du travail au Canada : comparaison entre provinces") %>% colformat_double(digit = 4)
+#tab9
+
+#tab9 <- knitr::kable(tab_all, caption = "Discrimination entre natifs et immigrants sur le marché du travail #au Canada : comparaison entre provinces", "simple")
 #tab_all %>% regulartable() %>% autofit() %>% set_caption("Discrimination entre natifs et immigrants sur le marché du travail au Canada : comparaison entre provinces") #for fitting PDF doc
 ```
+
+
+# RESUMÉ {.unnumbered}
+\@ref(tab:varDescrip)
+```{r varDescrip}
+tab1
+```
+
+```{r statdesc}
+tab2
+```
+
+

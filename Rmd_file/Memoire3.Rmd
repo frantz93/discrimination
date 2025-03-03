@@ -4,19 +4,19 @@ title: 'Discrimination sur le marché du travail : le cas des immigrants du Qué
 author: "Frantz Roby POINT DU JOUR"
 date: "`r Sys.Date()`"
 output:
-#  html_document:
-#    toc: TRUE
-#    number_sections: TRUE
-#    fig_caption: true
+  html_document:
+    toc: TRUE
+    number_sections: TRUE
+    fig_caption: true
 #  pdf_document: 
 #    toc: TRUE
 #    number_sections: TRUE
 #    fig_caption: true
     #latex_engine: xelatex
-  word_document:
-    toc: TRUE
-    number_sections: TRUE
-    fig_caption: true
+#  word_document:
+#    toc: TRUE
+#    number_sections: TRUE
+ #   fig_caption: true
     
 header-includes:
   \usepackage{caption}
@@ -97,7 +97,7 @@ Les données ont été collectées sur le site de Statistique Canada, l'institut
 
 ```{r loadbase}
 
-base <- read.csv("../datasets/pub0422.csv")
+base <- read.csv("../base/pub0422.csv")
 db <- data.frame(ID = base$REC_NUM, SURVYEAR = base$SURVYEAR, SURVMNTH = base$SURVMNTH,
                     PROV = base$PROV, AGE = base$AGE_12, SEX = base$SEX, MARSTAT = base$MARSTAT,
                     EDUC = base$EDUC, IMMIG = base$IMMIG, PAID = if_else(!is.na(base$HRLYEARN), 1, 0),
